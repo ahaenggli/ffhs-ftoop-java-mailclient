@@ -1,7 +1,6 @@
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
-import javax.activation.*;
 
 /**
  * A simple program for sending a mail message to gmail using SMTP.

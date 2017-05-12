@@ -34,8 +34,8 @@ public final class aMailClientSettings
 		
 		return  prefs.get(Name, ""); 
 	}
-	public final static Boolean setValue(String Name, String Value){
-		Boolean result = false;
+	public final static boolean setValue(String Name, String Value){
+		boolean result = false;
 		try {
 
 			prefs.sync();
@@ -52,23 +52,23 @@ public final class aMailClientSettings
 	
 	// pop3
 	public final static String  getPop3Server(){return getValue(POP3Server);}
-	public final static Boolean setPop3Server(String newValue){return setValue(POP3Server, newValue);}	
+	public final static boolean setPop3Server(String newValue){return setValue(POP3Server, newValue);}	
 	public final static String  getPop3User(){return getValue(POP3User);}
-	public final static Boolean setPop3User(String newValue){return setValue(POP3User, newValue);}	
+	public final static boolean setPop3User(String newValue){return setValue(POP3User, newValue);}	
 	public final static String  getPop3PW(){return getValue(POP3PW);}
-	public final static Boolean setPop3PW(String newValue){return setValue(POP3PW, newValue);}	
+	public final static boolean setPop3PW(String newValue){return setValue(POP3PW, newValue);}	
 	public final static String  getPop3Port(){return getValue(POP3Port);}
-	public final static Boolean setPop3Port(String newValue){return setValue(POP3Port, newValue);}
+	public final static boolean setPop3Port(String newValue){return setValue(POP3Port, newValue);}
 	
 	// smtp
 	public final static String  getsmtpServer(){return getValue(smtpServer);}
-	public final static Boolean setsmtpServer(String newValue){return setValue(smtpServer, newValue);}
+	public final static boolean setsmtpServer(String newValue){return setValue(smtpServer, newValue);}
 	public final static String  getsmtpUser(){return getValue(smtpUser);}
-	public final static Boolean setsmtpUser(String newValue){return setValue(smtpUser, newValue);}
+	public final static boolean setsmtpUser(String newValue){return setValue(smtpUser, newValue);}
 	public final static String  getsmtpPW(){return getValue(smtpPW);}
-	public final static Boolean setsmtpPW(String newValue){return setValue(smtpPW, newValue);}
+	public final static boolean setsmtpPW(String newValue){return setValue(smtpPW, newValue);}
 	public final static String  getsmtpPort(){return getValue(smtpPort);}
-	public final static Boolean setsmtpPort(String newValue){return setValue(smtpPort, newValue);}
+	public final static boolean setsmtpPort(String newValue){return setValue(smtpPort, newValue);}
 
 
 	

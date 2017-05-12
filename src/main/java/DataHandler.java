@@ -2,11 +2,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -15,104 +11,101 @@ public class DataHandler {
 
 	private final static Preferences folders = aMailClientSettings.getPrefs().node("Folders");
 	private ArrayList<DataFolderList> FolderList = new ArrayList<DataFolderList>();
-	private ArrayList<DataMailList>  MailList = new ArrayList<DataMailList>();
-	
-	private String gewaehlterMailOrdner = "x"; 
-	
-	private void createFolder(String Name, int SortNr, Preferences parent) throws BackingStoreException{
-		if (!parent.nodeExists(Name)){
-			parent.node(Name).putInt("SortNr", SortNr);			
+	private ArrayList<DataMailList> MailList = new ArrayList<DataMailList>();
+
+	private String gewaehlterMailOrdner = "x";
+
+	private static void createFolder(String Name, int SortNr, Preferences parent) throws BackingStoreException {
+		if (!parent.nodeExists(Name)) {
+			parent.node(Name).putInt("SortNr", SortNr);
 		}
 	}
-	
-	public void resetData(){
-		 FolderList = new ArrayList<DataFolderList>();
-		 MailList = new ArrayList<DataMailList>();		
-		 gewaehlterMailOrdner = "x";
+
+	public void resetData() {
+		FolderList = new ArrayList<DataFolderList>();
+		MailList = new ArrayList<DataMailList>();
+		gewaehlterMailOrdner = "x";
 	}
-	
-	public DataHandler()  {
+
+	public DataHandler() {
 		resetData();
 		try {
-			if (!folders.nodeExists("Posteingang")) createFolder("Posteingang", 1, folders);
-			if (!folders.nodeExists("Gesendet")) createFolder("Gesendet", 2, folders);		
+			if (!folders.nodeExists("Posteingang"))
+				createFolder("Posteingang", 1, folders);
+			if (!folders.nodeExists("Gesendet"))
+				createFolder("Gesendet", 2, folders);
 			FolderList = getDataFolders(folders);
 		} catch (BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		 
 	}
 
-	private void addMail(Preferences mail){
+	private void addMail(Preferences mail) {
 		Date Datum = new Date();
 		String Absender;
 		String Betreff;
 		String Nachricht;
-		String ID;
-		
+
 		System.out.println(mail.absolutePath());
 
 		DateFormat format = new SimpleDateFormat("dd.MM.yyyy H:mm", Locale.GERMAN);
 		try {
 			Datum = format.parse(mail.get("Datum", "27.07.1993 11:50"));
-			//System.out.println(Datum);
+			// System.out.println(Datum);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	
+
 		Absender = mail.get("Absender", "<unbekannt>");
-		Betreff  = mail.get("Betreff", "<leer>");
+		Betreff = mail.get("Betreff", "<leer>");
 		Nachricht = mail.get("Nachricht", "<nichts>");
-		
+
 		MailList.add(new DataMailList(Datum, Absender, Betreff, Nachricht, mail.name()));
-		//System.out.println("added Mail");
+		// System.out.println("added Mail");
 	}
-	
-	public ArrayList<DataFolderList> getDataFolders(Preferences parent) throws BackingStoreException{
-				
+
+	public ArrayList<DataFolderList> getDataFolders(Preferences parent) throws BackingStoreException {
+
 		ArrayList<DataFolderList> tmpList = new ArrayList<DataFolderList>();
-		
-		for(String childFolder : parent.childrenNames())
-		{
+
+		for (String childFolder : parent.childrenNames()) {
 			Preferences child = parent.node(childFolder);
-			String p = child.parent().absolutePath().replace(folders.absolutePath()+"/", "");
-			p = "[Ordner, "+p.replace("/", ", ")+"]";
-			
+			String p = child.parent().absolutePath().replace(folders.absolutePath() + "/", "");
+			p = "[Ordner, " + p.replace("/", ", ") + "]";
+
 			System.out.println(p);
 			System.out.println(gewaehlterMailOrdner);
 			System.out.println("");
-			
-			
-			if (!child.name().startsWith("msg_")){
-			int SortNr = parent.node(childFolder).getInt("SortNr", 0);
-			tmpList.add(new DataFolderList(SortNr, childFolder, child.absolutePath(), getDataFolders(child) ));
-			}else if(gewaehlterMailOrdner.equals(p)){
+
+			if (!child.name().startsWith("msg_")) {
+				int SortNr = parent.node(childFolder).getInt("SortNr", 0);
+				tmpList.add(new DataFolderList(SortNr, childFolder, child.absolutePath(), getDataFolders(child)));
+			} else if (gewaehlterMailOrdner.equals(p)) {
 				addMail(child);
-			
+
 			}
 		}
-		
+
 		tmpList.sort(null);
-		
-/*
-		for(DataFolderList myList: tmpList){
-			
-			System.out.print(myList.getSortNr());
-			System.out.print(myList.getName());
-			System.out.println("");
-		}*/
-		
+
+		/*
+		 * for(DataFolderList myList: tmpList){
+		 * 
+		 * System.out.print(myList.getSortNr());
+		 * System.out.print(myList.getName()); System.out.println(""); }
+		 */
+
 		return tmpList;
 	}
-	
-	public ArrayList<DataFolderList> getFolderList(){
+
+	public ArrayList<DataFolderList> getFolderList() {
 		return FolderList;
-		
+
 	}
-	
-	public ArrayList<DataMailList> getMailList(){
+
+	public ArrayList<DataMailList> getMailList() {
 		return MailList;
 	}
 
@@ -131,5 +124,5 @@ public class DataHandler {
 		}
 		System.out.println("ordner: " + this.gewaehlterMailOrdner + "; Anzahl: " + MailList.size());
 	}
-	
+
 }
