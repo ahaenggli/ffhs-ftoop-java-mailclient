@@ -20,9 +20,13 @@ Optional können noch folgende Funktionen implementiert werden:
 
 */
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Vector;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,7 +42,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.* ;
 
 
@@ -46,15 +51,26 @@ import javax.swing.* ;
 public class aMailClientGUI  extends JFrame {
 
   private JLabel StatusBar = new JLabel("StatusBar");
-  private JTable mailListe;
-  private SimpleTableModel m_simpleTableModel;
-  
+  private JTable table_mailListe;
+  private DataMailListTableModel m_simpleTableModel = new DataMailListTableModel();
+  private DataHandler dh = new DataHandler();
   private JFrame me = this;
-   
+  
+  
+  
+private DefaultMutableTreeNode baum_root = new DefaultMutableTreeNode( "Ordner" ) ;
+
+private JTree            baum_strukt   = new JTree( new DefaultTreeModel( baum_root )  ) ;
+
+
 	public void addRunnable(Runnable run){
-	    	EventQueue.invokeLater(run);    			
+	    	EventQueue.invokeLater(run);   	    	
 	}
 	
+	
+	public void changeOrdner(String neu){
+		dh.setGewaehlterMailOrdner(neu);
+	}
 	  
 	public JLabel guiGetStatusBar(){
 		
@@ -289,84 +305,97 @@ public class aMailClientGUI  extends JFrame {
 		return menuBar;
 	}
 	
-	
-	public JScrollPane guiGetFolders(){
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode( "1" ) ;
-	      addTreeChildren( root, 3, 10 ) ;
 
-	      DefaultTreeModel model  = new DefaultTreeModel( root ) ;
-	      JTree            tree   = new JTree( model ) ;
+	private void expandAllNodes(JTree tree, int startingIndex, int rowCount){
+	    for(int i=startingIndex;i<rowCount;++i){
+	        tree.expandRow(i);
+	    }
+
+	    if(tree.getRowCount()!=rowCount){
+	        expandAllNodes(tree, rowCount, tree.getRowCount());
+	    }
+	}
+	
+	public void refreshTreeStruct(){
+				
+			addTreeChildren( baum_root, dh.getFolderList()) ;
+	        baum_strukt.expandPath(baum_strukt.getPathForRow(0));
+	        baum_strukt.setSelectionPath(baum_strukt.getPathForRow(1));
+		
+	}
+	
+    
+	public JScrollPane guiGetFolders(){
+	
 	      
+	      refreshTreeStruct();
+	    
 	      TreeSelectionListener tsList = new TreeSelectionListener(){
 	    	  
 	   	   public void valueChanged( TreeSelectionEvent e )
 		   {
-		      DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getPath().getLastPathComponent() ;
-		      System.out.println( node.getUserObject() ) ; 
+		      DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.getNewLeadSelectionPath().getLastPathComponent();
+		      System.out.println( node) ;
+	   		
+	   		addRunnable(new Runnable(){
+	   			public void run() {
+		   		changeOrdner(e.getNewLeadSelectionPath().toString());
+		   		refreshMailListe();
+		   		
+		   		//refreshTreeStruct();
+	   			}
+	   		});
+		    
+	   		//System.out.println( e.getNewLeadSelectionPath()) ; 
 		   }
 	      };
 	      
-	      tree.addTreeSelectionListener( tsList ) ;
-
-	      JScrollPane      scroll = new JScrollPane( tree ) ;
-	      //scroll.setBounds(0, 0, 100, 800);
-	      //getContentPane().add( scroll ) ;
+	      baum_strukt.addTreeSelectionListener( tsList ) ;
+  
+  
+	      JScrollPane      scroll = new JScrollPane( baum_strukt ) ;
+    
 	      scroll.setPreferredSize(new Dimension(250, 500));
 
 		return scroll;
 	}
 	
+	public void refreshMailListe(){
+		
+		m_simpleTableModel.setNewData(dh.getMailList());
+		m_simpleTableModel.fireTableDataChanged();
+		
+	}
 	
 	public JScrollPane guiGetMailListe(){
-		
-		
-		String[] columnNames = {
-				"Erhalten",
-                "Von",
-                "Betreff",                
-                "Auswahl"};
-		
-		Object[][] data = {
-			    {"Kathy", "Smith",
-			     "Snowboarding", new Integer(5), new Boolean(false)},
-			    {"John", "Doe",
-			     "Rowing", new Integer(3), new Boolean(true)},
-			    {"Sue", "Black",
-			     "Knitting", new Integer(2), new Boolean(false)},
-			    {"Jane", "White",
-			     "Speed reading", new Integer(20), new Boolean(true)},
-			    {"Joe", "Brown",
-			     "Pool", new Integer(10), new Boolean(false)}
-			};
-		
-		
-		
-	    Vector dummyMacData = new Vector(10, 10);
-	    dummyMacData.addElement(new Data( "A", "123","C", false, new Integer(100)));
-	    dummyMacData.addElement(new Data( "B", "234","C", false, new Integer(101)));
-	    dummyMacData.addElement(new Data( "C", "456","C", false, new Integer(102)));
-	    
-	    m_simpleTableModel = new SimpleTableModel(dummyMacData);
-	    JTable table = new JTable(m_simpleTableModel);
-	    
-	    
-		table.setFillsViewportHeight(true);
-		table.setAutoCreateRowSorter(true);
-		table.setDefaultEditor(Object.class, null);
-		table.addMouseListener(new java.awt.event.MouseAdapter() {
+		//m_simpleTableModel = new DataMailListTableModel(dh.getMailList());
+		dh.setGewaehlterMailOrdner("[Ordner, Posteingang]");
+		refreshMailListe();
+		table_mailListe = new JTable(m_simpleTableModel);	    
+		table_mailListe.setFillsViewportHeight(true);
+		table_mailListe.setAutoCreateRowSorter(true);
+		table_mailListe.setDefaultEditor(Object.class, null);
+		table_mailListe.addMouseListener(new java.awt.event.MouseAdapter() {
 		    @Override
 		    public void mouseClicked(java.awt.event.MouseEvent evt) {
-		        int row = table.rowAtPoint(evt.getPoint());
-		        int col = table.columnAtPoint(evt.getPoint());
+		        int row = table_mailListe.rowAtPoint(evt.getPoint());
+		        int col = table_mailListe.columnAtPoint(evt.getPoint());
 		        if (row >= 0 && col >= 0 &&  evt.getClickCount() == 2 ) {
-		            JOptionPane.showMessageDialog(null, "Test" + row, "Test Titel", JOptionPane.OK_CANCEL_OPTION);
+		        	String texti;
+		        	texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), 3).toString();
+		        			
+		        			
+		            JOptionPane.showMessageDialog(null, texti, "Nachricht", JOptionPane.OK_CANCEL_OPTION);
 
 		        }
 		    }
 		});
   
-	    
-	    JScrollPane scroll = new JScrollPane(table ) ;
+		TableColumnModel tcm = table_mailListe.getColumnModel();
+		tcm.removeColumn( tcm.getColumn(4) );
+		tcm.removeColumn( tcm.getColumn(3) );
+		
+	    JScrollPane scroll = new JScrollPane(table_mailListe ) ;
 	    //JScrollPane scrollPane = new JScrollPane(m_simpleTable);
 	    //getContentPane().add(scrollPane);
 	    
@@ -388,27 +417,31 @@ public class aMailClientGUI  extends JFrame {
 	      add( guiGetFolders(), BorderLayout.WEST   ) ;
 	      add( guiGetMailListe(),  BorderLayout.CENTER ) ;
 	      add( guiGetStatusBar(),  BorderLayout.SOUTH  ) ;
-	      
+
 	      // Set the size and show the window
 	      setSize( 800, 600 ) ;
 	      setVisible( true ) ;
 	}
 	
 	
-	   public void addTreeChildren( DefaultMutableTreeNode parent, int count, int level )
+	   public void addTreeChildren( DefaultMutableTreeNode parent, ArrayList<DataFolderList> Elements )
 	   {
-	      if( level > 0 )
+	      if( Elements.size() > 0 )
 	      {
-	         for( int i = 0; i < count; i++ )
+	    	  
+	         for(DataFolderList Element : Elements)
 	         {
-	            DefaultMutableTreeNode child = new DefaultMutableTreeNode( parent.getUserObject() + String.valueOf(i+1) ) ;
-	            addTreeChildren( child, count, level - 1 ) ;
+	            DefaultMutableTreeNode child = new DefaultMutableTreeNode( Element.getName() ) ;
+	            	            
+	            addTreeChildren( child, Element.getChildren() ) ;
+	            
 	            parent.add( child ) ;
 	         }
+	         
 	      }
 	   }
    
-	   
+	 
 	   /**
 	    * The program starts here.
 	    * Note that it will not terminate when the main
@@ -420,6 +453,8 @@ public class aMailClientGUI  extends JFrame {
 	   public static void main( String args[] )
 	   {
 	      new aMailClientGUI() ;
+
+	     
 	   }
 	   
 }

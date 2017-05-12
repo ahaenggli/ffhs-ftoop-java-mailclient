@@ -6,7 +6,7 @@ public final class aMailClientSettings
 	// Retrieve the user preference node for the package com.mycompany
 
 	private final static Preferences prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
-
+    public final static Preferences getPrefs() {return prefs;}
 	// pop3
 	private final static String POP3Server = "POP3Server";
 	private final static String POP3User = "POP3User";
