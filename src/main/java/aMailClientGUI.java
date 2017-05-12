@@ -1,3 +1,24 @@
+/*
+Funktionen
+Ihre Anwendung muss mindestens folgende Funktionen implementieren:
+
+- Konfiguration von POP3 sowie SMTP Zugangsdaten 
+
+- Abholen von Mails von einem POP3 Server
+- Einsortieren von abgeholten Mails in einen Standard Ordner „Neue Mails“
+- Öffnen einer Detailansicht von Mails in einem neuen Fenster mit Antwort/Weiterleitungsfunktion
+- Erstellen von neuen Mails und Senden via SMTP
+- Beantworten und weiterleiten von Mails
+
+
+Für die Anbindung des Mailservers wird Ihnen im Moodle eine Bibliothek zur Verfügung gestellt.
+Optional können noch folgende Funktionen implementiert werden:
+- Verarbeitung von Attachments in empfangenen und gesendeten Mails
+- Automatisches Abholen per Zeitintervall
+- Anlegen, Bearbeiten und Löschen von lokalen Mail Ordnern
+- Verschieben von Mails in einen existierenden Ordner
+
+*/
 import java.awt.Dimension;
 import java.util.Vector;
 
@@ -25,8 +46,9 @@ import javax.swing.* ;
 public class aMailClientGUI  extends JFrame {
 
   private JLabel StatusBar = new JLabel("StatusBar");
-  private JTable m_simpleTable;
+  private JTable mailListe;
   private SimpleTableModel m_simpleTableModel;
+  
   private JFrame me = this;
    
 	public void addRunnable(Runnable run){
@@ -198,55 +220,9 @@ public class aMailClientGUI  extends JFrame {
 		Datei.getAccessibleContext().setAccessibleDescription(
 		        "The only menu in this program that has menu items");
 		
-	
 		
 		menuBar.add(Datei);
-/*
-		//a group of JMenuItems
-		menuItem = new JMenuItem("A text-only menu item",
-		                         KeyEvent.VK_T);
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(
-		        KeyEvent.VK_1, ActionEvent.ALT_MASK));
-		menuItem.getAccessibleContext().setAccessibleDescription(
-		        "This doesn't really do anything");
-		Datei.add(menuItem);
 
-		menuItem = new JMenuItem("Both text and icon",
-		                         new ImageIcon("images/middle.gif"));
-		menuItem.setMnemonic(KeyEvent.VK_B);
-		Datei.add(menuItem);
-
-		menuItem = new JMenuItem(new ImageIcon("images/middle.gif"));
-		menuItem.setMnemonic(KeyEvent.VK_D);
-		Datei.add(menuItem);
-
-		//a group of radio button menu items
-		Datei.addSeparator();
-		ButtonGroup group = new ButtonGroup();
-		rbMenuItem = new JRadioButtonMenuItem("A radio button menu item");
-		rbMenuItem.setSelected(true);
-		rbMenuItem.setMnemonic(KeyEvent.VK_R);
-		group.add(rbMenuItem);
-		Datei.add(rbMenuItem);
-
-		rbMenuItem = new JRadioButtonMenuItem("Another one");
-		rbMenuItem.setMnemonic(KeyEvent.VK_O);
-		group.add(rbMenuItem);
-		Datei.add(rbMenuItem);
-
-		//a group of check box menu items
-		Datei.addSeparator();
-		cbMenuItem = new JCheckBoxMenuItem("A check box menu item");
-		cbMenuItem.setMnemonic(KeyEvent.VK_C);
-		Datei.add(cbMenuItem);
-
-		cbMenuItem = new JCheckBoxMenuItem("Another one");
-		cbMenuItem.setMnemonic(KeyEvent.VK_H);
-		Datei.add(cbMenuItem);
-
-		//a submenu
-		Datei.addSeparator();
-		*/
 		menuItem = new JMenuItem("Beenden");	
 		menuItem.setMnemonic(KeyEvent.VK_B);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
