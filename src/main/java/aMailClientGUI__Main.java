@@ -238,7 +238,7 @@ public class aMailClientGUI__Main extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 		
 				if (evt.getClickCount() == 2) {
-					new aMailClientGUI_MailFenster(getSelectedMailListRow(evt.getPoint(), 2), getSelectedMailListRow(evt.getPoint(), 3));
+					new aMailClientGUI_MailFenster(getSelectedMailListRow(evt.getPoint(), 2), getSelectedMailListRow(evt.getPoint(), 3), "", 0);
 				}
 			}
 		});

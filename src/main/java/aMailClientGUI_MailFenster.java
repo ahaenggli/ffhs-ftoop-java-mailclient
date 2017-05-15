@@ -2,6 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,51 +19,157 @@ import javax.swing.WindowConstants;
 
 public class aMailClientGUI_MailFenster extends JDialog {
 
-	private JTextField to = new JTextField(30), cc = new JTextField(30), bcc = new JTextField(30), subject = new JTextField(30);
-    private JTextPane content = new JTextPane();
-    private JButton send;
-    private JPanel alles;
-          
-    public aMailClientGUI_MailFenster(String Betreff, String Text){
-    	super();
-
-		subject.setText(Betreff);
-		content.setText(Text);
+	private JTextField Empfaenger = new JTextField(30);
+	private JTextField Kopie = new JTextField(30);
+	private JTextField Blindkopie = new JTextField(30);
+	private JTextField Betreff = new JTextField(30);	
+	private JTextPane Nachricht = new JTextPane();
+	
+	private JButton Sendenbutton = new JButton("Send");
+	private JButton Antworten = new JButton("Antworten");
+	private JButton Weiterleiten = new JButton("Weiterleiten");
+	private JButton Loeschen = new JButton("Loeschen");
+	
+	private boolean isAW = false;
+	private boolean isWG = false;
+	
+	private JPanel alles;
+	/**
+	 * 0 = nichts (gesperrt)
+	 * 1 = senden (leer)
+	 * 2 = Antworten
+	 * 3 = Weiterleiten
+	 * 4 = Löschen
+	 */
+	private int Aktion = 0;
+	
+	public void changeAction(int act){
 		
-		setTitle("Einstellungen");
-		setSize(450, 400);
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-		alles = new JPanel();
 		
-		   
-		   alles.add(createComponentWithLabel("to", to));
-		   alles.add(createComponentWithLabel("cc", cc));
-		   alles.add(createComponentWithLabel("bcc", bcc));
-		   alles.add(createComponentWithLabel("subject", subject));
-		   
-		   
-		   alles.setBackground(Color.cyan);
-		   //content = ;
-		   content.setPreferredSize(new Dimension(375, 200));
-		   send = new JButton("Send");
-		        //send.addActionListener(new SendListener());
-		        alles.add(content);
-		        alles.add(send);
-		    add(alles);
-		// Wir lassen unseren Dialog anzeigen
-		setModal(false);
-		setVisible(true);
+			EventQueue.invokeLater(new Runnable(){
+
+				@Override
+				public void run() {
+					Aktion = act;
+					doAction();
+				}
+				
+				
+			});
+		
+
 
 	}
 	
+	public aMailClientGUI_MailFenster(String betreff, String nachricht, String empfaenger, int action) {
+		super();
+
+		Empfaenger.setText(empfaenger);
+		
+		Betreff.setText(betreff);
+		Nachricht.setText(nachricht);
+		
+		Aktion = action;
+		
+		setTitle("Nachricht");
+		setSize(400, 500);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+		alles = new JPanel();
+
+		
+		alles.add(Sendenbutton);
+		
+		
+		Antworten.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeAction(2);				
+			}
+		});
+		
+		
+		alles.add(Antworten);
+		
+		
+		Weiterleiten.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeAction(3);				
+			}
+		});
+		
+		alles.add(Weiterleiten);
+		
+		
+		Loeschen.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeAction(4);				
+			}
+		});
+		
+		alles.add(Loeschen);
 	
+		
+		alles.add(createComponentWithLabel("Empfaenger:", Empfaenger));
+		alles.add(createComponentWithLabel("Kopie:", Kopie));
+		alles.add(createComponentWithLabel("Blindkopie:", Blindkopie));
+		alles.add(createComponentWithLabel("Betreff:", Betreff));
+
+		Nachricht.setPreferredSize(new Dimension(350, 200));
+		
+		// send.addActionListener(new SendListener());
+	
+		alles.add(createComponentWithLabel("Nachricht:", Nachricht));
+
+		
+		add(alles);
+		doAction();
+		// so viele Fenster wie man möchte erlauben und Parent nicht sperren
+		setModal(false);
+		// Fenster sichtbar machen
+		setVisible(true);
+
+	}
+	private void doAction(){
+		boolean setter = false;
+		
+		if(Aktion == 0)	setter = false;
+		else if(Aktion == 2){
+			setter = true;
+			if(!isAW)	Betreff.setText("AW: " + Betreff.getText());
+			isAW = true;
+		} 
+		else if(Aktion == 3){
+			setter = true;
+			if(!isWG) Betreff.setText("WG: " + Betreff.getText());
+			isWG = true;
+		} 
+		else if(Aktion == 4){
+			dispose();
+			
+		}
+		else setter = false;
+		
+		Empfaenger.setEnabled(setter);
+		Kopie.setEnabled(setter);
+		Blindkopie.setEnabled(setter);
+		
+		Nachricht.setEnabled(setter);
+		Betreff.setEnabled(setter);		
+		Sendenbutton.setVisible(setter);
+		repaint();
+	}
 	private JPanel createComponentWithLabel(String label, Component comp) {
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
-        p.add(new JLabel(label, JLabel.RIGHT), BorderLayout.WEST);
-        p.add(comp, BorderLayout.CENTER);
-        return p;
-    }
-	
+		label.trim();
+		
+		JPanel p = new JPanel();		
+		p.setLayout(new BorderLayout());
+		p.add(new JLabel(label + " ", JLabel.LEFT), BorderLayout.PAGE_START);
+		p.add(comp, BorderLayout.CENTER);		
+		return p;
+		
+	}
+
 }
