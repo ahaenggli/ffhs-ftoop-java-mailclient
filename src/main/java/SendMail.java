@@ -14,15 +14,14 @@ public class SendMail {
 	 * @param args
 	 *            Not used
 	 */
-	public static void main(String[] args) {
-		// Receiver mail address
-		String to = "------@------.ch";
+	public SendMail(String Empfaenger, String Betreff, String Nachricht) {
+	
 
 		// Sender mail address
-		String from = "------@gmail.com";
+		String from = aMailClientSettings.getsmtpUser();
 
-		String username = "-----@gmail.com";
-		String password = "-----";
+		String username = aMailClientSettings.getsmtpUser();
+		String password = aMailClientSettings.getsmtpPW();
 
 		// Get system properties
 		Properties properties = System.getProperties();
@@ -30,8 +29,8 @@ public class SendMail {
 		// Setup properties for the mail server
 		properties.setProperty("mail.smtp.auth", "true");
 		properties.setProperty("mail.smtp.starttls.enable", "true");
-		properties.setProperty("mail.smtp.host", "smtp.gmail.com");
-		properties.setProperty("mail.smtp.port", "587");
+		properties.setProperty("mail.smtp.host", aMailClientSettings.getsmtpServer());
+		properties.setProperty("mail.smtp.port", aMailClientSettings.getsmtpPort());
 
 		// Get the default Session object
 		Session session = Session.getDefaultInstance(properties);
@@ -44,18 +43,18 @@ public class SendMail {
 			message.setFrom(new InternetAddress(from));
 
 			// Set To: header field of the header
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(Empfaenger));
 
 			// Set Subject: header field
-			message.setSubject("Testmail");
+			message.setSubject(Betreff);
 
 			// Now set the actual message
-			message.setText("Na Bravo !");
+			message.setText(Nachricht);
 
 			Transport transport = session.getTransport("smtps");
 
 			try {
-				transport.connect("smtp.gmail.com", username, password);
+				transport.connect(aMailClientSettings.getsmtpServer(), username, password);
 				transport.sendMessage(message, message.getAllRecipients());
 			} finally {
 				transport.close();
