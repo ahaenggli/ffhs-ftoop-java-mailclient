@@ -4,12 +4,9 @@ Funktionen
 Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 
 - Konfiguration von POP3 sowie SMTP Zugangsdaten 
-
-
 - Öffnen einer Detailansicht von Mails in einem neuen Fenster mit Antwort/Weiterleitungsfunktion
 - Beantworten und weiterleiten von Mails
 - Erstellen von neuen Mails und Senden via SMTP
-
 - Abholen von Mails von einem POP3 Server
 - Einsortieren von abgeholten Mails in einen Standard Ordner „Neue Mails“
 
@@ -102,7 +99,7 @@ public class aMailClientGUI__Main extends JFrame {
 		// Where the GUI is created:
 		JMenuBar menuBar;
 		JMenu Datei, Extras;
-		JMenuItem menuItem, Einstellungen, Aktualisieren;
+		JMenuItem menuItem, Einstellungen, Aktualisieren, Neuesmail;
 
 
 		// Create the menu bar.
@@ -170,8 +167,45 @@ public class aMailClientGUI__Main extends JFrame {
 		Aktualisieren.getAccessibleContext().setAccessibleDescription("Mails empfangen");
 		Aktualisieren.setMnemonic(KeyEvent.VK_M);
 		Aktualisieren.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.ALT_MASK));
+		Aktualisieren.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			
+				addRunnable(new Runnable(){
+
+					@Override
+					public void run() {
+						(new Thread(){
+							public void run(){
+								new ReceiveMail();
+								refreshMailListe();
+							}
+					}).start();
+					}
+				
+				});
+				
+		
+				
+			}
+			
+		});
 		Extras.add(Aktualisieren);
 
+		// Neues Mail machen
+		Neuesmail = new JMenuItem("Neue Nachricht");
+		Neuesmail.getAccessibleContext().setAccessibleDescription("Neue Nachricht schreiben");
+		Neuesmail.setMnemonic(KeyEvent.VK_N);
+		
+		Neuesmail.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new aMailClientGUI_MailFenster("", "", "", 1);				
+			}
+			
+		});
+		Extras.add(Neuesmail);
+		
 		return menuBar;
 	}
 
@@ -221,6 +255,7 @@ public class aMailClientGUI__Main extends JFrame {
 
 		m_simpleTableModel.setNewData(dh.getMailList());
 		m_simpleTableModel.fireTableDataChanged();
+		super.update(this.getGraphics());
 
 	}
 
@@ -238,7 +273,7 @@ public class aMailClientGUI__Main extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 		
 				if (evt.getClickCount() == 2) {
-					new aMailClientGUI_MailFenster(getSelectedMailListRow(evt.getPoint(), 2), getSelectedMailListRow(evt.getPoint(), 3), "", 0);
+					new aMailClientGUI_MailFenster(getSelectedMailListRow(evt.getPoint(), 2), getSelectedMailListRow(evt.getPoint(), 3), getSelectedMailListRow(evt.getPoint(), 1), 0);
 				}
 			}
 		});
