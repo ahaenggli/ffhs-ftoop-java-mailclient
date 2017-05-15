@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -34,6 +35,8 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	
 	private boolean isAW = false;
 	private boolean isWG = false;
+	private Preferences Herkunft;
+	private aMailClientGUI__Main Parent;
 	
 	private JPanel alles;
 	
@@ -66,7 +69,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 		
 		if(!e.isEmpty() && !b.isEmpty() && !n.isEmpty()){
 			
-			DataMailList mail = new DataMailList(new Date(), e, b, n, null);
+			DataMailList mail = new DataMailList(new Date(), e, b, n, null, null);
 			DataHandler.addMailToFolder(mail, DataHandler.getGesendet());
 			
 			new SendMail(e, b, n);
@@ -74,13 +77,15 @@ public class aMailClientGUI_MailFenster extends JDialog {
 			dispose();
 		}
 	}
-	public aMailClientGUI_MailFenster(String betreff, String nachricht, String empfaenger, int action) {
+	public aMailClientGUI_MailFenster(aMailClientGUI__Main parent, String betreff, String nachricht, String empfaenger, Preferences hk, int action) {
 		super();
 
 		Empfaenger.setText(empfaenger);
 		
 		Betreff.setText(betreff);
 		Nachricht.setText(nachricht);
+		Herkunft = hk;
+		this.Parent = parent;
 		
 		Aktion = action;
 		
@@ -177,6 +182,13 @@ public class aMailClientGUI_MailFenster extends JDialog {
 			
 		} 
 		else if(Aktion == 4){
+			DataHandler.removeMail(Herkunft);
+			
+			
+
+			Parent.refreshGUI();
+			
+			
 			dispose();
 			
 		}

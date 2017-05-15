@@ -20,6 +20,7 @@ Optional können noch folgende Funktionen implementiert werden:
 */
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import javax.swing.table.TableColumnModel;
 
@@ -46,7 +47,7 @@ public class aMailClientGUI__Main extends JFrame {
 	private JTable table_mailListe;
 	private DataMailListTableModel m_simpleTableModel = new DataMailListTableModel();
 	private DataHandler dh = new DataHandler();
-
+	private aMailClientGUI__Main me = this;
 	private DefaultMutableTreeNode baum_root = new DefaultMutableTreeNode("Ordner");
 
 	private JTree baum_strukt = new JTree(new DefaultTreeModel(baum_root));
@@ -55,8 +56,21 @@ public class aMailClientGUI__Main extends JFrame {
 		EventQueue.invokeLater(run);
 	}
 
-	public String getSelectedMailListRow(Point evt, int colS){
-		String texti = "";
+	public void refreshGUI(){
+		addRunnable(new Runnable(){
+
+			@Override
+			public void run() {				
+				changeOrdner(baum_strukt.getSelectionPath().toString());
+				refreshMailListe();				
+			}
+			
+		});
+	}
+	
+	
+	public Object getSelectedMailListRow(Point evt, int colS){
+		Object texti = "";
 		
 		int row = table_mailListe.rowAtPoint(evt);
 		int col = table_mailListe.columnAtPoint(evt);
@@ -64,7 +78,8 @@ public class aMailClientGUI__Main extends JFrame {
 			
 			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS)
 					.toString();
-
+			if(colS == 5)
+			texti = dh.getMailList().get(row).getHerkunft();
 			
 		}
 		
@@ -178,9 +193,7 @@ public class aMailClientGUI__Main extends JFrame {
 						(new Thread(){
 							public void run(){
 								new ReceiveMail();
-								refreshMailListe();
-								changeOrdner(baum_strukt.getSelectionPath().toString());
-								refreshMailListe();
+								refreshGUI();
 							}
 					}).start();
 					}
@@ -202,7 +215,7 @@ public class aMailClientGUI__Main extends JFrame {
 		Neuesmail.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new aMailClientGUI_MailFenster("", "", "", 1);				
+				new aMailClientGUI_MailFenster(me, "", "", "", null, 1);				
 			}
 			
 		});
@@ -234,7 +247,8 @@ public class aMailClientGUI__Main extends JFrame {
 				addRunnable(new Runnable() {
 					public void run() {
 						changeOrdner(e.getNewLeadSelectionPath().toString());
-						refreshMailListe();
+						//refreshTreeStruct();
+						refreshGUI();
 
 						// refreshTreeStruct();
 					}
@@ -275,7 +289,13 @@ public class aMailClientGUI__Main extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 		
 				if (evt.getClickCount() == 2) {
-					new aMailClientGUI_MailFenster(getSelectedMailListRow(evt.getPoint(), 2), getSelectedMailListRow(evt.getPoint(), 3), getSelectedMailListRow(evt.getPoint(), 1), 0);
+					new aMailClientGUI_MailFenster( me,
+							(String) getSelectedMailListRow(evt.getPoint(), 2), 
+							(String) getSelectedMailListRow(evt.getPoint(), 3), 
+							(String) getSelectedMailListRow(evt.getPoint(), 1),
+							(Preferences) getSelectedMailListRow(evt.getPoint(), 5), 
+							0);
+					
 				}
 			}
 		});

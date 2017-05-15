@@ -80,7 +80,7 @@ public class ReceiveMail {
 				// This could lead to troubles if anything but text was sent
 				System.out.println(msg.getContent());
 
-				DataMailList mail = new DataMailList(sent, subject, from, msg.getContent().toString(), null);
+				DataMailList mail = new DataMailList(sent, subject, from, msg.getContent().toString(), null, null);
 				DataHandler.addMailToFolder(mail, DataHandler.getEingang());
 
 				/*

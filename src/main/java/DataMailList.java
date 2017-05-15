@@ -1,6 +1,7 @@
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 public class DataMailList {
 	private Date Datum;
@@ -8,57 +9,45 @@ public class DataMailList {
 	private String Betreff;
 	private String Nachricht;
 	private String ID;
+	private Preferences Herkunft;
 
 	  public static String newID() {
 	    return new BigInteger(130, new SecureRandom()).toString(20);
 	  }
 	
-	public DataMailList(Date datum, String sender, String betreff, String nachricht, String ID) {
+	
+	  
+	public DataMailList(Date datum, String sender, String betreff, String nachricht, String ID, Preferences hk) {
 		this.Datum = datum;
 		this.Absender = sender;
 		this.Betreff = betreff;
 		this.Nachricht = nachricht;
 		this.ID = ID;
+		this.Herkunft = hk;
 	}
 
 	public Date getDatum() {
 		return Datum;
 	}
 
-	public void setDatum(Date datum) {
-		Datum = datum;
-	}
-
 	public String getAbsender() {
 		return Absender;
-	}
-
-	public void setAbsender(String sender) {
-		Absender = sender;
 	}
 
 	public String getBetreff() {
 		return Betreff;
 	}
 
-	public void setBetreff(String betreff) {
-		Betreff = betreff;
-	}
-
 	public String getNachricht() {
 		return Nachricht;
-	}
-
-	public void setNachricht(String nachricht) {
-		Nachricht = nachricht;
 	}
 
 	public String getID() {
 		return ID;
 	}
-
-	public void setID(String iD) {
-		ID = iD;
+	public Preferences getHerkunft(){
+		return Herkunft;
 	}
+
 
 }

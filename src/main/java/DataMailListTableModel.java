@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.prefs.Preferences;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -10,8 +11,8 @@ class DataMailListTableModel extends AbstractTableModel {
 	 */
 	private static final long serialVersionUID = -6659022226302820746L;
 
-	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID" };
-	public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class };
+	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID"};
+	public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class};
 
 	private ArrayList<DataMailList> m_macDataVector;
 
@@ -40,6 +41,7 @@ class DataMailListTableModel extends AbstractTableModel {
 		DataMailList macData = (m_macDataVector.get(row));
 
 		switch (col) {
+		/*
 		case 0:
 			macData.setDatum((Date) value);
 			break;
@@ -54,7 +56,7 @@ class DataMailListTableModel extends AbstractTableModel {
 			break;
 		case 4:
 			macData.setID((String) value);
-			break;
+			break;*/
 		default:
 			break;
 		}

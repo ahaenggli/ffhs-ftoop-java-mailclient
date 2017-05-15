@@ -10,13 +10,36 @@ import java.util.prefs.Preferences;
 public class DataHandler {
 
 	private final static Preferences folders = aMailClientSettings.getPrefs().node("Folders");
+	private Preferences aktFolder = null;
+	
 	private ArrayList<DataFolderList> FolderList = new ArrayList<DataFolderList>();
 	private ArrayList<DataMailList> MailList = new ArrayList<DataMailList>();
 
 	private String gewaehlterMailOrdner = "x";
 
-	
-	
+	public Preferences getAktFolder(){
+		return aktFolder;
+	}
+	public static boolean removeMail(Preferences mail){
+		boolean result = false;
+		
+		
+		try {
+			mail.clear();
+			mail.removeNode();
+			folders.flush();
+			folders.sync();
+			result = true;
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result = false;
+		}finally{
+		
+		
+		return result;
+		}
+	}
 	public static boolean addMailToFolder(DataMailList mail, Preferences folder){
 		boolean result = false;
 			
@@ -65,6 +88,12 @@ public class DataHandler {
 		FolderList = new ArrayList<DataFolderList>();
 		MailList = new ArrayList<DataMailList>();
 		gewaehlterMailOrdner = "x";
+		try {
+			folders.sync();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public DataHandler() {
@@ -102,7 +131,7 @@ public class DataHandler {
 		Betreff = mail.get("Betreff", "<leer>");
 		Nachricht = mail.get("Nachricht", "<nichts>");
 
-		MailList.add(new DataMailList(Datum, Absender, Betreff, Nachricht, mail.name()));
+		MailList.add(new DataMailList(Datum, Absender, Betreff, Nachricht, mail.name(), mail));
 		// System.out.println("added Mail");
 	}
 
@@ -124,8 +153,12 @@ public class DataHandler {
 				tmpList.add(new DataFolderList(SortNr, childFolder, child.absolutePath(), getDataFolders(child)));
 			} else if (gewaehlterMailOrdner.equals(p)) {
 				addMail(child);
-
+				aktFolder = child;
 			}
+			
+			
+			
+			
 		}
 
 		tmpList.sort(null);
