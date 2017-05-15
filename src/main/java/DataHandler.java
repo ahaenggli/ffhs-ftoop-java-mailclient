@@ -33,7 +33,7 @@ public class DataHandler {
 			Preferences newNachricht = folder.node(msg_name);
 			newNachricht.put("Absender", mail.getAbsender());
 			newNachricht.put("Betreff", mail.getBetreff());
-			newNachricht.put("Datum", mail.getDatum().toString());
+			newNachricht.putLong("Datum", mail.getDatum().getTime());
 			newNachricht.put("Nachricht", mail.getNachricht());
 
 			
@@ -90,11 +90,11 @@ public class DataHandler {
 
 		System.out.println(mail.absolutePath());
 
-		DateFormat format = new SimpleDateFormat("dd.MM.yyyy H:mm", Locale.GERMAN);
+		//DateFormat format = new SimpleDateFormat("dd.MM.yyyy H:mm", Locale.GERMAN);
 		try {
-			Datum = format.parse(mail.get("Datum", "27.07.1993 11:50"));
+			Datum.setTime(mail.getLong("Datum", 0));
 			// System.out.println(Datum);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
