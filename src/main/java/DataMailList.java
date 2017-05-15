@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Date;
 
 public class DataMailList {
@@ -7,6 +9,10 @@ public class DataMailList {
 	private String Nachricht;
 	private String ID;
 
+	  public static String newID() {
+	    return new BigInteger(130, new SecureRandom()).toString(20);
+	  }
+	
 	public DataMailList(Date datum, String sender, String betreff, String nachricht, String ID) {
 		this.Datum = datum;
 		this.Absender = sender;

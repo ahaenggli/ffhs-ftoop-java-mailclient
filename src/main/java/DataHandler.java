@@ -15,6 +15,46 @@ public class DataHandler {
 
 	private String gewaehlterMailOrdner = "x";
 
+	
+	
+	public static boolean addMailToFolder(DataMailList mail, Preferences folder){
+		boolean result = false;
+			
+		try {
+			String msg_name = "";
+			
+			if(mail.getID() == null) msg_name =  mail.newID();
+			else msg_name = mail.getID();
+			
+			if(!msg_name.startsWith("msg_")) msg_name = "msg_" + msg_name;
+		
+			createFolder(msg_name, 0, folder);
+
+			Preferences newNachricht = folder.node(msg_name);
+			newNachricht.put("Absender", mail.getAbsender());
+			newNachricht.put("Betreff", mail.getBetreff());
+			newNachricht.put("Datum", mail.getDatum().toString());
+			newNachricht.put("Nachricht", mail.getNachricht());
+
+			
+			result = true;
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result = false;
+		}
+		finally{
+		return result;
+		}
+	}
+	
+	public static Preferences getEingang(){
+		return folders.node("Posteingang");
+	}
+	public static Preferences getGesendet(){
+		return folders.node("Gesendet");
+	}
+	
 	private static void createFolder(String Name, int SortNr, Preferences parent) throws BackingStoreException {
 		if (!parent.nodeExists(Name)) {
 			parent.node(Name).putInt("SortNr", SortNr);

@@ -11,7 +11,7 @@ class DataMailListTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = -6659022226302820746L;
 
 	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID" };
-	public Class[] m_colTypes = { Date.class, String.class, String.class, String.class, String.class };
+	public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class };
 
 	private ArrayList<DataMailList> m_macDataVector;
 
@@ -73,7 +73,7 @@ class DataMailListTableModel extends AbstractTableModel {
 
 		switch (col) {
 		case 0:
-			return macData.getDatum();
+			return macData.getDatum().toLocaleString();
 		case 1:
 			return macData.getAbsender();
 		case 2:
