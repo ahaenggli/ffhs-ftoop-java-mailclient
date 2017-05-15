@@ -16,13 +16,13 @@ public class ReceiveMail {
 	 * @param args
 	 *            Not used
 	 */
-	public static void main(String[] args) {
+	public ReceiveMail() {
 		// The IP address of the POP3 server
-		String host = "pop.gmail.com";
+		String host = aMailClientSettings.getPop3Server();
 
 		// Username and password
-		String user = "---@gmail.com";
-		String password = "---";
+		String user = aMailClientSettings.getPop3User();
+		String password = aMailClientSettings.getPop3PW();
 
 		// Get system properties
 		Properties properties = System.getProperties();
@@ -52,6 +52,7 @@ public class ReceiveMail {
 
 			// Display message
 			for (int i = 0; i < messages.length; i++) {
+
 				Message msg = messages[i];
 
 				String from = InternetAddress.toString(msg.getFrom());
@@ -76,9 +77,11 @@ public class ReceiveMail {
 
 				// Empty line to separate header from body
 				System.out.println();
-
 				// This could lead to troubles if anything but text was sent
 				System.out.println(msg.getContent());
+
+				DataMailList mail = new DataMailList(sent, subject, from, msg.getContent().toString(), null);
+				DataHandler.addMailToFolder(mail, DataHandler.getEingang());
 
 				/*
 				 * In der endgueltigen Version sollen die Mails geloest werden
