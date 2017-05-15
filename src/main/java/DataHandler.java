@@ -9,11 +9,11 @@ import java.util.prefs.Preferences;
 
 public class DataHandler {
 
-	private final static Preferences folders = aMailClientSettings.getPrefs().node("Folders");
+	private final static Preferences folders = aMailClient__Settings.getPrefs().node("Folders");
 	private Preferences aktFolder = null;
 	
-	private ArrayList<DataFolderList> FolderList = new ArrayList<DataFolderList>();
-	private ArrayList<DataMailList> MailList = new ArrayList<DataMailList>();
+	private ArrayList<DataMailFolderStruktur> FolderList = new ArrayList<DataMailFolderStruktur>();
+	private ArrayList<DataMailStrukur> MailList = new ArrayList<DataMailStrukur>();
 
 	private String gewaehlterMailOrdner = "x";
 
@@ -40,7 +40,7 @@ public class DataHandler {
 		return result;
 		}
 	}
-	public static boolean addMailToFolder(DataMailList mail, Preferences folder){
+	public static boolean addMailToFolder(DataMailStrukur mail, Preferences folder){
 		boolean result = false;
 			
 		try {
@@ -85,8 +85,8 @@ public class DataHandler {
 	}
 
 	public void resetData() {
-		FolderList = new ArrayList<DataFolderList>();
-		MailList = new ArrayList<DataMailList>();
+		FolderList = new ArrayList<DataMailFolderStruktur>();
+		MailList = new ArrayList<DataMailStrukur>();
 		gewaehlterMailOrdner = "x";
 		try {
 			folders.sync();
@@ -131,13 +131,13 @@ public class DataHandler {
 		Betreff = mail.get("Betreff", "<leer>");
 		Nachricht = mail.get("Nachricht", "<nichts>");
 
-		MailList.add(new DataMailList(Datum, Absender, Betreff, Nachricht, mail.name(), mail));
+		MailList.add(new DataMailStrukur(Datum, Absender, Betreff, Nachricht, mail.name(), mail));
 		// System.out.println("added Mail");
 	}
 
-	public ArrayList<DataFolderList> getDataFolders(Preferences parent) throws BackingStoreException {
+	public ArrayList<DataMailFolderStruktur> getDataFolders(Preferences parent) throws BackingStoreException {
 
-		ArrayList<DataFolderList> tmpList = new ArrayList<DataFolderList>();
+		ArrayList<DataMailFolderStruktur> tmpList = new ArrayList<DataMailFolderStruktur>();
 
 		for (String childFolder : parent.childrenNames()) {
 			Preferences child = parent.node(childFolder);
@@ -150,7 +150,7 @@ public class DataHandler {
 
 			if (!child.name().startsWith("msg_")) {
 				int SortNr = parent.node(childFolder).getInt("SortNr", 0);
-				tmpList.add(new DataFolderList(SortNr, childFolder, child.absolutePath(), getDataFolders(child)));
+				tmpList.add(new DataMailFolderStruktur(SortNr, childFolder, child.absolutePath(), getDataFolders(child)));
 			} else if (gewaehlterMailOrdner.equals(p)) {
 				addMail(child);
 				aktFolder = child;
@@ -173,12 +173,12 @@ public class DataHandler {
 		return tmpList;
 	}
 
-	public ArrayList<DataFolderList> getFolderList() {
+	public ArrayList<DataMailFolderStruktur> getFolderList() {
 		return FolderList;
 
 	}
 
-	public ArrayList<DataMailList> getMailList() {
+	public ArrayList<DataMailStrukur> getMailList() {
 		return MailList;
 	}
 

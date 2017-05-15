@@ -15,13 +15,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-public class aMailClientGUI_Einstellungen extends JDialog {
+public class aMailClient_GUI_Einstellungen extends JDialog {
 
 	
 
 	private static final long serialVersionUID = -8439476419298094881L;
 
-	public aMailClientGUI_Einstellungen() {
+	public aMailClient_GUI_Einstellungen() {
 		super();
 		//super("adriano's MailClient - Einstellungen");
 		// Set the default behaviour for the close button
@@ -52,10 +52,10 @@ public class aMailClientGUI_Einstellungen extends JDialog {
 		JLabel pop3_username_label = new JLabel("Username: ");
 		JLabel pop3_password_label = new JLabel("Password: ");
 
-		JTextField pop3_serverField = new JTextField(aMailClientSettings.getPop3Server(), 20);
-		JTextField pop3_usernameField = new JTextField(aMailClientSettings.getPop3User(), 20);
-		JPasswordField pop3_passwordField = new JPasswordField(aMailClientSettings.getPop3PW(), 20);
-		JTextField pop3_portField = new JTextField(aMailClientSettings.getPop3Port(), 20);
+		JTextField pop3_serverField = new JTextField(aMailClient__Settings.getPop3Server(), 20);
+		JTextField pop3_usernameField = new JTextField(aMailClient__Settings.getPop3User(), 20);
+		JPasswordField pop3_passwordField = new JPasswordField(aMailClient__Settings.getPop3PW(), 20);
+		JTextField pop3_portField = new JTextField(aMailClient__Settings.getPop3Port(), 20);
 
 		pop3_server_label.setDisplayedMnemonic(KeyEvent.VK_S);
 		pop3_server_label.setLabelFor(pop3_serverField);
@@ -78,10 +78,10 @@ public class aMailClientGUI_Einstellungen extends JDialog {
 		JButton pop3_save = new JButton("Speichern");
 		pop3_save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				aMailClientSettings.setPop3Server(pop3_serverField.getText());
-				aMailClientSettings.setPop3User(pop3_usernameField.getText());
-				aMailClientSettings.setPop3PW(new String(pop3_passwordField.getPassword()));
-				aMailClientSettings.setPop3Port(pop3_portField.getText());
+				aMailClient__Settings.setPop3Server(pop3_serverField.getText());
+				aMailClient__Settings.setPop3User(pop3_usernameField.getText());
+				aMailClient__Settings.setPop3PW(new String(pop3_passwordField.getPassword()));
+				aMailClient__Settings.setPop3Port(pop3_portField.getText());
 			}
 		});
 
@@ -101,10 +101,10 @@ public class aMailClientGUI_Einstellungen extends JDialog {
 		JLabel smtp_username_label = new JLabel("Username: ");
 		JLabel smtp_password_label = new JLabel("Password: ");
 
-		JTextField smtp_serverField = new JTextField(aMailClientSettings.getsmtpServer(), 20);
-		JTextField smtp_usernameField = new JTextField(aMailClientSettings.getsmtpUser(), 20);
-		JPasswordField smtp_passwordField = new JPasswordField(aMailClientSettings.getsmtpPW(), 20);
-		JTextField smtp_portField = new JTextField(aMailClientSettings.getsmtpPort(), 20);
+		JTextField smtp_serverField = new JTextField(aMailClient__Settings.getsmtpServer(), 20);
+		JTextField smtp_usernameField = new JTextField(aMailClient__Settings.getsmtpUser(), 20);
+		JPasswordField smtp_passwordField = new JPasswordField(aMailClient__Settings.getsmtpPW(), 20);
+		JTextField smtp_portField = new JTextField(aMailClient__Settings.getsmtpPort(), 20);
 
 		smtp_server_label.setDisplayedMnemonic(KeyEvent.VK_S);
 		smtp_server_label.setLabelFor(smtp_serverField);
@@ -127,10 +127,10 @@ public class aMailClientGUI_Einstellungen extends JDialog {
 		JButton smtp_save = new JButton("Speichern");
 		smtp_save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				aMailClientSettings.setsmtpServer(smtp_serverField.getText());
-				aMailClientSettings.setsmtpUser(smtp_usernameField.getText());
-				aMailClientSettings.setsmtpPW(new String(smtp_passwordField.getPassword()));
-				aMailClientSettings.setsmtpPort(smtp_portField.getText());
+				aMailClient__Settings.setsmtpServer(smtp_serverField.getText());
+				aMailClient__Settings.setsmtpUser(smtp_usernameField.getText());
+				aMailClient__Settings.setsmtpPW(new String(smtp_passwordField.getPassword()));
+				aMailClient__Settings.setsmtpPort(smtp_portField.getText());
 			}
 		});
 

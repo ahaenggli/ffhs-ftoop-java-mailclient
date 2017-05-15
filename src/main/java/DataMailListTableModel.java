@@ -14,18 +14,18 @@ class DataMailListTableModel extends AbstractTableModel {
 	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID"};
 	public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class};
 
-	private ArrayList<DataMailList> m_macDataVector;
+	private ArrayList<DataMailStrukur> m_macDataVector;
 
 	public DataMailListTableModel() {
 		super();
 	}
 
-	public DataMailListTableModel(ArrayList<DataMailList> tmpMailList) {
+	public DataMailListTableModel(ArrayList<DataMailStrukur> tmpMailList) {
 		super();
 		m_macDataVector = tmpMailList;
 	}
 
-	public void setNewData(ArrayList<DataMailList> tmpMailList) {
+	public void setNewData(ArrayList<DataMailStrukur> tmpMailList) {
 		m_macDataVector = tmpMailList;
 	}
 
@@ -38,7 +38,7 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public void setValueAt(Object value, int row, int col) {
-		DataMailList macData = (m_macDataVector.get(row));
+		DataMailStrukur macData = (m_macDataVector.get(row));
 
 		switch (col) {
 		/*
@@ -71,7 +71,7 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
-		DataMailList macData = (m_macDataVector.get(row));
+		DataMailStrukur macData = (m_macDataVector.get(row));
 
 		switch (col) {
 		case 0:

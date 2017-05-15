@@ -18,11 +18,11 @@ public class ReceiveMail {
 	 */
 	public ReceiveMail() {
 		// The IP address of the POP3 server
-		String host = aMailClientSettings.getPop3Server();
+		String host = aMailClient__Settings.getPop3Server();
 
 		// Username and password
-		String user = aMailClientSettings.getPop3User();
-		String password = aMailClientSettings.getPop3PW();
+		String user = aMailClient__Settings.getPop3User();
+		String password = aMailClient__Settings.getPop3PW();
 
 		// Get system properties
 		Properties properties = System.getProperties();
@@ -80,7 +80,7 @@ public class ReceiveMail {
 				// This could lead to troubles if anything but text was sent
 				System.out.println(msg.getContent());
 
-				DataMailList mail = new DataMailList(sent, subject, from, msg.getContent().toString(), null, null);
+				DataMailStrukur mail = new DataMailStrukur(sent, subject, from, msg.getContent().toString(), null, null);
 				DataHandler.addMailToFolder(mail, DataHandler.getEingang());
 
 				/*

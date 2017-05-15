@@ -1,12 +1,12 @@
 import java.util.*;
 
-public class DataFolderList implements Comparable<DataFolderList> {
+public class DataMailFolderStruktur implements Comparable<DataMailFolderStruktur> {
 	private int SortNr;
 	private String Name;
 	private String AbsolutePath;
-	private ArrayList<DataFolderList> Children;
+	private ArrayList<DataMailFolderStruktur> Children;
 
-	public DataFolderList(int SortNr, String Name, String AbsolutePath, ArrayList<DataFolderList> Children) {
+	public DataMailFolderStruktur(int SortNr, String Name, String AbsolutePath, ArrayList<DataMailFolderStruktur> Children) {
 		this.SortNr = SortNr;
 		this.Name = Name;
 		this.Children = Children;
@@ -21,7 +21,7 @@ public class DataFolderList implements Comparable<DataFolderList> {
 		return this.Name;
 	}
 
-	public ArrayList<DataFolderList> getChildren() {
+	public ArrayList<DataMailFolderStruktur> getChildren() {
 		return this.Children;
 	}
 
@@ -35,7 +35,7 @@ public class DataFolderList implements Comparable<DataFolderList> {
 	 */
 
 	@Override
-	public int compareTo(DataFolderList o) {
+	public int compareTo(DataMailFolderStruktur o) {
 		Integer a = Integer.valueOf(this.getSortNr());
 		Integer b = Integer.valueOf(o.getSortNr());
 

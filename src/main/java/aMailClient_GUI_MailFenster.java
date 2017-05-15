@@ -20,7 +20,7 @@ import javax.swing.JTextPane;
 
 import javax.swing.WindowConstants;
 
-public class aMailClientGUI_MailFenster extends JDialog {
+public class aMailClient_GUI_MailFenster extends JDialog {
 
 	private JTextField Empfaenger = new JTextField(30);
 	private JTextField Kopie = new JTextField(30);
@@ -36,7 +36,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	private boolean isAW = false;
 	private boolean isWG = false;
 	private Preferences Herkunft;
-	private aMailClientGUI__Main Parent;
+	private aMailClient_GUI__Main Parent;
 	
 	private JPanel alles;
 	
@@ -69,7 +69,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 		
 		if(!e.isEmpty() && !b.isEmpty() && !n.isEmpty()){
 			
-			DataMailList mail = new DataMailList(new Date(), e, b, n, null, null);
+			DataMailStrukur mail = new DataMailStrukur(new Date(), e, b, n, null, null);
 			DataHandler.addMailToFolder(mail, DataHandler.getGesendet());
 			
 			new SendMail(e, b, n);
@@ -77,7 +77,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 			dispose();
 		}
 	}
-	public aMailClientGUI_MailFenster(aMailClientGUI__Main parent, String betreff, String nachricht, String empfaenger, Preferences hk, int action) {
+	public aMailClient_GUI_MailFenster(aMailClient_GUI__Main parent, String betreff, String nachricht, String empfaenger, Preferences hk, int action) {
 		super();
 
 		Empfaenger.setText(empfaenger);

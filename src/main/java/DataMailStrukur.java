@@ -3,7 +3,7 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
-public class DataMailList {
+public class DataMailStrukur {
 	private Date Datum;
 	private String Absender;
 	private String Betreff;
@@ -17,7 +17,7 @@ public class DataMailList {
 	
 	
 	  
-	public DataMailList(Date datum, String sender, String betreff, String nachricht, String ID, Preferences hk) {
+	public DataMailStrukur(Date datum, String sender, String betreff, String nachricht, String ID, Preferences hk) {
 		this.Datum = datum;
 		this.Absender = sender;
 		this.Betreff = betreff;

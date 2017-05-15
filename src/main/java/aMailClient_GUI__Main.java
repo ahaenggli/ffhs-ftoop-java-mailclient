@@ -40,14 +40,14 @@ import javax.swing.tree.DefaultTreeModel;
 
 import javax.swing.*;
 
-public class aMailClientGUI__Main extends JFrame {
+public class aMailClient_GUI__Main extends JFrame {
 
 	private static final long serialVersionUID = 8508453892315236372L;
 	private JLabel StatusBar = new JLabel("StatusBar");
 	private JTable table_mailListe;
 	private DataMailListTableModel m_simpleTableModel = new DataMailListTableModel();
 	private DataHandler dh = new DataHandler();
-	private aMailClientGUI__Main me = this;
+	private aMailClient_GUI__Main me = this;
 	private DefaultMutableTreeNode baum_root = new DefaultMutableTreeNode("Ordner");
 
 	private JTree baum_strukt = new JTree(new DefaultTreeModel(baum_root));
@@ -100,7 +100,7 @@ public class aMailClientGUI__Main extends JFrame {
 	}
 
 	public void ShowSettingDialog() {
-		new aMailClientGUI_Einstellungen();
+		new aMailClient_GUI_Einstellungen();
 	}
 
 	public JMenuBar guiGetMenu() {
@@ -215,7 +215,7 @@ public class aMailClientGUI__Main extends JFrame {
 		Neuesmail.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new aMailClientGUI_MailFenster(me, "", "", "", null, 1);				
+				new aMailClient_GUI_MailFenster(me, "", "", "", null, 1);				
 			}
 			
 		});
@@ -289,7 +289,7 @@ public class aMailClientGUI__Main extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 		
 				if (evt.getClickCount() == 2) {
-					new aMailClientGUI_MailFenster( me,
+					new aMailClient_GUI_MailFenster( me,
 							(String) getSelectedMailListRow(evt.getPoint(), 2), 
 							(String) getSelectedMailListRow(evt.getPoint(), 3), 
 							(String) getSelectedMailListRow(evt.getPoint(), 1),
@@ -311,7 +311,7 @@ public class aMailClientGUI__Main extends JFrame {
 		return scroll;
 	}
 
-	public aMailClientGUI__Main() {
+	public aMailClient_GUI__Main() {
 		super("adriano's MailClient - GUI");
 		// Set the default behaviour for the close button
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -329,10 +329,10 @@ public class aMailClientGUI__Main extends JFrame {
 		setVisible(true);
 	}
 
-	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<DataFolderList> Elements) {
+	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<DataMailFolderStruktur> Elements) {
 		if (Elements.size() > 0) {
 
-			for (DataFolderList Element : Elements) {
+			for (DataMailFolderStruktur Element : Elements) {
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(Element.getName());
 
 				addTreeChildren(child, Element.getChildren());
@@ -352,7 +352,7 @@ public class aMailClientGUI__Main extends JFrame {
 	 *            Not used
 	 */
 	public static void main(String args[]) {
-		new aMailClientGUI__Main();
+		new aMailClient_GUI__Main();
 
 	}
 

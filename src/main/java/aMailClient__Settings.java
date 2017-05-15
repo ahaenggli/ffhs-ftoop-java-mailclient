@@ -1,7 +1,7 @@
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-public final class aMailClientSettings
+public final class aMailClient__Settings
 {
 	// Retrieve the user preference node for the package com.mycompany
 

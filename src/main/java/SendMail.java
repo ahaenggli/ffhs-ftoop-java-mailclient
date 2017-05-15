@@ -18,10 +18,10 @@ public class SendMail {
 	
 
 		// Sender mail address
-		String from = aMailClientSettings.getsmtpUser();
+		String from = aMailClient__Settings.getsmtpUser();
 
-		String username = aMailClientSettings.getsmtpUser();
-		String password = aMailClientSettings.getsmtpPW();
+		String username = aMailClient__Settings.getsmtpUser();
+		String password = aMailClient__Settings.getsmtpPW();
 
 		// Get system properties
 		Properties properties = System.getProperties();
@@ -29,8 +29,8 @@ public class SendMail {
 		// Setup properties for the mail server
 		properties.setProperty("mail.smtp.auth", "true");
 		properties.setProperty("mail.smtp.starttls.enable", "true");
-		properties.setProperty("mail.smtp.host", aMailClientSettings.getsmtpServer());
-		properties.setProperty("mail.smtp.port", aMailClientSettings.getsmtpPort());
+		properties.setProperty("mail.smtp.host", aMailClient__Settings.getsmtpServer());
+		properties.setProperty("mail.smtp.port", aMailClient__Settings.getsmtpPort());
 
 		// Get the default Session object
 		Session session = Session.getDefaultInstance(properties);
@@ -54,7 +54,7 @@ public class SendMail {
 			Transport transport = session.getTransport("smtps");
 
 			try {
-				transport.connect(aMailClientSettings.getsmtpServer(), username, password);
+				transport.connect(aMailClient__Settings.getsmtpServer(), username, password);
 				transport.sendMessage(message, message.getAllRecipients());
 			} finally {
 				transport.close();
