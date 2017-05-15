@@ -179,6 +179,8 @@ public class aMailClientGUI__Main extends JFrame {
 							public void run(){
 								new ReceiveMail();
 								refreshMailListe();
+								changeOrdner(baum_strukt.getSelectionPath().toString());
+								refreshMailListe();
 							}
 					}).start();
 					}
@@ -255,7 +257,7 @@ public class aMailClientGUI__Main extends JFrame {
 
 		m_simpleTableModel.setNewData(dh.getMailList());
 		m_simpleTableModel.fireTableDataChanged();
-		super.update(this.getGraphics());
+
 
 	}
 
