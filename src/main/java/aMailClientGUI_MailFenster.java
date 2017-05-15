@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -25,7 +27,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	private JTextField Betreff = new JTextField(30);	
 	private JTextPane Nachricht = new JTextPane();
 	
-	private JButton Sendenbutton = new JButton("Send");
+	private JButton Sendenbutton = new JButton("Senden");
 	private JButton Antworten = new JButton("Antworten");
 	private JButton Weiterleiten = new JButton("Weiterleiten");
 	private JButton Loeschen = new JButton("Loeschen");
@@ -34,6 +36,10 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	private boolean isWG = false;
 	
 	private JPanel alles;
+	
+	
+	private HashMap componentMap = new HashMap<String,Component>();
+	
 	/**
 	 * 0 = nichts (gesperrt)
 	 * 1 = senden (leer)
@@ -43,24 +49,31 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	 */
 	private int Aktion = 0;
 	
-	public void changeAction(int act){
-		
-		
+	public void changeAction(int act){			
 			EventQueue.invokeLater(new Runnable(){
-
 				@Override
 				public void run() {
 					Aktion = act;
 					doAction();
 				}
-				
-				
-			});
-		
-
-
+			});	
 	}
-	
+	private void sendeNachricht(){
+		String e = Empfaenger.getText().trim();
+		String b = Betreff.getText().trim();
+		String n = Nachricht.getText().trim();
+		
+		
+		if(!e.isEmpty() && !b.isEmpty() && !n.isEmpty()){
+			
+			DataMailList mail = new DataMailList(new Date(), e, b, n, null);
+			DataHandler.addMailToFolder(mail, DataHandler.getGesendet());
+			
+			new SendMail(e, b, n);
+					
+			dispose();
+		}
+	}
 	public aMailClientGUI_MailFenster(String betreff, String nachricht, String empfaenger, int action) {
 		super();
 
@@ -77,6 +90,13 @@ public class aMailClientGUI_MailFenster extends JDialog {
 
 		alles = new JPanel();
 
+		
+		Sendenbutton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendeNachricht();			
+			}
+		});
 		
 		alles.add(Sendenbutton);
 		
@@ -112,7 +132,7 @@ public class aMailClientGUI_MailFenster extends JDialog {
 		alles.add(Loeschen);
 	
 		
-		alles.add(createComponentWithLabel("Empfaenger:", Empfaenger));
+		alles.add(createComponentWithLabel("Empfaenger / Absender:", Empfaenger));
 		alles.add(createComponentWithLabel("Kopie:", Kopie));
 		alles.add(createComponentWithLabel("Blindkopie:", Blindkopie));
 		alles.add(createComponentWithLabel("Betreff:", Betreff));
@@ -134,8 +154,16 @@ public class aMailClientGUI_MailFenster extends JDialog {
 	}
 	private void doAction(){
 		boolean setter = false;
+	
+		//((JLabel) getComponentByName("lbl_Empfaenger")).setText("Empfänger");
+		if(Aktion == 0){	setter = false;
 		
-		if(Aktion == 0)	setter = false;
+	//	((JLabel) getComponentByName("lbl_Empfaenger")).setText("Absender");
+		}
+		else if(Aktion == 1){
+			setter = true;
+		
+		}
 		else if(Aktion == 2){
 			setter = true;
 			if(!isAW)	Betreff.setText("AW: " + Betreff.getText());
@@ -145,6 +173,8 @@ public class aMailClientGUI_MailFenster extends JDialog {
 			setter = true;
 			if(!isWG) Betreff.setText("WG: " + Betreff.getText());
 			isWG = true;
+			Empfaenger.setText("");
+			
 		} 
 		else if(Aktion == 4){
 			dispose();
@@ -156,20 +186,41 @@ public class aMailClientGUI_MailFenster extends JDialog {
 		Kopie.setEnabled(setter);
 		Blindkopie.setEnabled(setter);
 		
+		
 		Nachricht.setEnabled(setter);
 		Betreff.setEnabled(setter);		
-		Sendenbutton.setVisible(setter);
+		Sendenbutton.setEnabled(setter);
+		
+		if(Aktion == 1)
+		{
+			Antworten.setEnabled(false);
+			Weiterleiten.setEnabled(false);
+		}
+		
 		repaint();
 	}
 	private JPanel createComponentWithLabel(String label, Component comp) {
 		label.trim();
 		
-		JPanel p = new JPanel();		
+		JPanel p = new JPanel();
+		JLabel lbl = new JLabel(label + " ", JLabel.LEFT);
+		lbl.setName("lbl_" + label.replace(":", ""));
+		
 		p.setLayout(new BorderLayout());
-		p.add(new JLabel(label + " ", JLabel.LEFT), BorderLayout.PAGE_START);
+		p.add(lbl, BorderLayout.PAGE_START);
 		p.add(comp, BorderLayout.CENTER);		
+		
+	//	componentMap.put(lbl.getName(), lbl);
+		  
 		return p;
 		
 	}
+	/*
+	private Component getComponentByName(String name) {
+        if (componentMap.containsKey(name)) {
+                return (Component) componentMap.get(name);
+        }
+        else return null;
+}*/
 
 }
