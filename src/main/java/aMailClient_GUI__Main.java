@@ -32,6 +32,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -298,6 +299,35 @@ public class aMailClient_GUI__Main extends JFrame {
 					
 				}
 			}
+		});
+	
+		table_mailListe.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+		
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+		if(e.getKeyCode() == KeyEvent.VK_DELETE){
+					
+					//e.get
+					if(table_mailListe.getSelectedRow() > -1)
+					DataHandler.removeMail(dh.getMailList().get(table_mailListe.convertRowIndexToModel(table_mailListe.getSelectedRow())).getHerkunft());
+					
+					refreshGUI();
+				} //else System.out.println(e.getKeyCode());
+			}
+			
 		});
 
 		TableColumnModel tcm = table_mailListe.getColumnModel();

@@ -23,7 +23,7 @@ public class DataHandler {
 	public static boolean removeMail(Preferences mail){
 		boolean result = false;
 		
-		
+		if(mail != null){
 		try {
 			mail.clear();
 			mail.removeNode();
@@ -34,11 +34,9 @@ public class DataHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			result = false;
-		}finally{
-		
-		
-		return result;
 		}
+		}
+		return result;
 	}
 	public static boolean addMailToFolder(DataMailStrukur mail, Preferences folder){
 		boolean result = false;

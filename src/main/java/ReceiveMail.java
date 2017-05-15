@@ -56,31 +56,27 @@ public class ReceiveMail {
 				Message msg = messages[i];
 
 				String from = InternetAddress.toString(msg.getFrom());
-				if (from != null) {
-					System.out.println("From: " + from);
-				}
+				//if (from != null) 					System.out.println("From: " + from);
+				
 
 				String to = InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO));
-				if (to != null) {
-					System.out.println("To: " + to);
-				}
+				//if (to != null) 					System.out.println("To: " + to);
+				
 
 				String subject = msg.getSubject();
-				if (subject != null) {
-					System.out.println("Subject: " + subject);
-				}
+				//if (subject != null) 					System.out.println("Subject: " + subject);
+				
 
 				Date sent = msg.getSentDate();
-				if (sent != null) {
-					System.out.println("Sent: " + sent);
-				}
+				//if (sent != null) 					System.out.println("Sent: " + sent);
+				
 
 				// Empty line to separate header from body
-				System.out.println();
+				//System.out.println();
 				// This could lead to troubles if anything but text was sent
-				System.out.println(msg.getContent());
+				//System.out.println(msg.getContent());
 
-				DataMailStrukur mail = new DataMailStrukur(sent, subject, from, msg.getContent().toString(), null, null);
+				DataMailStrukur mail = new DataMailStrukur(sent, from, subject, msg.getContent().toString(), null, null);
 				DataHandler.addMailToFolder(mail, DataHandler.getEingang());
 
 				/*
