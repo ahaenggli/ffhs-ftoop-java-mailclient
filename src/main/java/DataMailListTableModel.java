@@ -1,6 +1,5 @@
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.prefs.Preferences;
+
 
 import javax.swing.table.AbstractTableModel;
 
@@ -18,7 +17,7 @@ class DataMailListTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = -6659022226302820746L;
 
 	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID"};
-	public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class};
+	//public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class};
 
 	private ArrayList<MailStruktur> m_macDataVector;
 
@@ -44,24 +43,24 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public void setValueAt(Object value, int row, int col) {
-		MailStruktur macData = (m_macDataVector.get(row));
+		//MailStruktur macData = (m_macDataVector.get(row));
 
 	}
 
 	public String getColumnName(int col) {
 		return m_colNames[col];
 	}
-
+/*
 	public Class getColumnClass(int col) {
 		return m_colTypes[col];
 	}
-
+*/
 	public Object getValueAt(int row, int col) {
 		MailStruktur macData = (m_macDataVector.get(row));
 
 		switch (col) {
 		case 0:
-			return macData.getDatum().toLocaleString();
+			return macData.getDatum().toString();
 		case 1:
 			return macData.getAbsender();
 		case 2:

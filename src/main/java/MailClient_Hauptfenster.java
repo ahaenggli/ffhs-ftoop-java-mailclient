@@ -32,7 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -144,11 +143,11 @@ public class MailClient_Hauptfenster extends JFrame {
 	 *            Gewaehlte Zeile
 	 * @return Herkunft von Mail
 	 */
-	public int getSelectedMailListRow(Point evt, int colS) {
+	public int getSelectedMailListRow(Point evt) {
 		//int texti = "";
 
 		int row = table_mailListe.rowAtPoint(evt);
-		int col = table_mailListe.columnAtPoint(evt);
+		//int col = table_mailListe.columnAtPoint(evt);
 		/*if (row >= 0 && col >= 0) {
 
 			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS).toString();
@@ -207,7 +206,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * @param text
 	 *            Wert fuer StatusBar
 	 */
-	public void setStatusBarText(String text) {
+	public void setStatusBarText(final String text) {
 
 		addRunnable(new Runnable() {
 
@@ -254,7 +253,13 @@ public class MailClient_Hauptfenster extends JFrame {
 		menuItem.setMnemonic(KeyEvent.VK_B);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 
-		menuItem.addActionListener(actionEvent -> System.exit(0));
+		menuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+				
+			}});
 		Datei.add(menuItem);
 
 		Extras = new JMenu("Extras");
@@ -363,7 +368,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		// Was bei Auswahl von Ordner passieren soll
 		baum_strukt.addTreeSelectionListener(new TreeSelectionListener() {
 
-			public void valueChanged(TreeSelectionEvent e) {
+			public void valueChanged(final TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getNewLeadSelectionPath()
 						.getLastPathComponent();
 
@@ -600,7 +605,7 @@ public class MailClient_Hauptfenster extends JFrame {
 				if (evt.getClickCount() == 2) {
 					
 					
-					new MailClient_MailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint(), 0)), 0);
+					new MailClient_MailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint())), 0);
 					
 					/*
 					new MailClient_MailFenster(mailHandler.getMailList()[], (String) ,

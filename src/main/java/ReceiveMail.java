@@ -159,7 +159,7 @@ public class ReceiveMail {
 	/**
 	 * Liste der empfangenen Mails
 	 * 
-	 * @return
+	 * @return Liste aller neuen Mails
 	 */
 	public ArrayList<MailStruktur> getnewMailList() {
 		return newMailList;

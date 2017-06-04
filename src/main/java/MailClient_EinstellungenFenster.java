@@ -61,10 +61,10 @@ public class MailClient_EinstellungenFenster extends JDialog {
 		JLabel pop3_username_label = new JLabel("Username: ");
 		JLabel pop3_password_label = new JLabel("Password: ");
 
-		JTextField pop3_serverField = new JTextField(Configuration.getPop3Server(), 20);
-		JTextField pop3_usernameField = new JTextField(Configuration.getPop3User(), 20);
-		JPasswordField pop3_passwordField = new JPasswordField(Configuration.getPop3PW(), 20);
-		JTextField pop3_portField = new JTextField(Configuration.getPop3Port(), 20);
+		final JTextField pop3_serverField = new JTextField(Configuration.getPop3Server(), 20);
+		final JTextField pop3_usernameField = new JTextField(Configuration.getPop3User(), 20);
+		final JPasswordField pop3_passwordField = new JPasswordField(Configuration.getPop3PW(), 20);
+		final JTextField pop3_portField = new JTextField(Configuration.getPop3Port(), 20);
 
 		pop3_server_label.setDisplayedMnemonic(KeyEvent.VK_S);
 		pop3_server_label.setLabelFor(pop3_serverField);
@@ -113,10 +113,10 @@ public class MailClient_EinstellungenFenster extends JDialog {
 		JLabel smtp_username_label = new JLabel("Username: ");
 		JLabel smtp_password_label = new JLabel("Password: ");
 
-		JTextField smtp_serverField = new JTextField(Configuration.getsmtpServer(), 20);
-		JTextField smtp_usernameField = new JTextField(Configuration.getsmtpUser(), 20);
-		JPasswordField smtp_passwordField = new JPasswordField(Configuration.getsmtpPW(), 20);
-		JTextField smtp_portField = new JTextField(Configuration.getsmtpPort(), 20);
+		final JTextField smtp_serverField = new JTextField(Configuration.getsmtpServer(), 20);
+		final JTextField smtp_usernameField = new JTextField(Configuration.getsmtpUser(), 20);
+		final JPasswordField smtp_passwordField = new JPasswordField(Configuration.getsmtpPW(), 20);
+		final JTextField smtp_portField = new JTextField(Configuration.getsmtpPort(), 20);
 
 		smtp_server_label.setDisplayedMnemonic(KeyEvent.VK_S);
 		smtp_server_label.setLabelFor(smtp_serverField);
@@ -164,7 +164,7 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				JLabel div_autoLaden= new JLabel("Mails alle x Minuten automatisch laden: ");
 	
 
-				JTextField div_autoLaden_Field = new JTextField(Configuration.getAnzahlminuten().toString(), 20);
+				final JTextField div_autoLaden_Field = new JTextField(Configuration.getAnzahlminuten().toString(), 20);
 
 
 				div_autoLaden.setDisplayedMnemonic(KeyEvent.VK_S);

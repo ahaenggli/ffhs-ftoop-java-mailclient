@@ -29,11 +29,12 @@ public class SendMail {
 	}
 		
 	/**
-	 * Constructs and sends a simple email.
+	 * Sendet eine Mail
 	 *
-	 * @param args
-	 *            Not used
+	 * @param newMail
+	 *        Mail zum senden
 	 * @return 
+	 * Erfolg ja|nein
 	 */
 	public boolean send(MailStruktur newMail){
 		this.mail = newMail;

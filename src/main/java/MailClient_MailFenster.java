@@ -55,7 +55,7 @@ public class MailClient_MailFenster extends JDialog {
 	 * @param act
 	 *            Zahl 0-4
 	 */
-	public void changeAction(int act) {
+	public void changeAction(final int act) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -233,6 +233,7 @@ public class MailClient_MailFenster extends JDialog {
 	 * @param label
 	 * @param comp
 	 * @return
+	 * JPane mit Label und Ursprungskomponente
 	 */
 	private JPanel macheLabelZuKomponente(String label, Component comp) {
 		label.trim();

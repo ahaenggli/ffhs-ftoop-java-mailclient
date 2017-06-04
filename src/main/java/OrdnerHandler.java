@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -91,8 +93,17 @@ public class OrdnerHandler {
 
 		}
 
-		tmpList.sort(null);
+		//ArrayList.sort(tmpList);
+		
+		//tmpList.sort(new Comparable<OrdnerStruktur>);
 
+		//List<Contact> contacts = new ArrayList<Contact>();
+		// Fill it.
+
+		Collections.sort(tmpList);
+		
+		
+		
 		if (gewaehlterMailOrdner.equals("[" + Configuration.getFolders().name() + "]"))
 			aktFolder = Configuration.getFolders();
 

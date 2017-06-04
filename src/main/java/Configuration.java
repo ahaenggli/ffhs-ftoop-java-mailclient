@@ -242,7 +242,9 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt POP3User zurueck
 	 * @return
+	 * Text
 	 */
 	public final static String getPop3User() {
 		return getValue(POP3User);
@@ -258,7 +260,9 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt POP3PW zurück
 	 * @return
+	 * text
 	 */
 	public final static String getPop3PW() {
 		return getValue(POP3PW);
@@ -274,7 +278,9 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt POP3Port zurück
 	 * @return
+	 * Text
 	 */
 	public final static String getPop3Port() {
 		return getValue(POP3Port);
@@ -293,7 +299,9 @@ public final class Configuration {
 	 * STMP Einstellungen lesen/schreiben fuer andere Klassen/Methoden
 	 */
 	/**
+	 * Gibt smtpServer zurück
 	 * @return
+	 * Text
 	 */
 	public final static String getsmtpServer() {
 		return getValue(smtpServer);
@@ -309,7 +317,9 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt smtpUser zurück
 	 * @return
+	 * Text
 	 */
 	public final static String getsmtpUser() {
 		return getValue(smtpUser);
@@ -325,7 +335,10 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt smtpPW zurück
+	 * 
 	 * @return
+	 * Text
 	 */
 	public final static String getsmtpPW() {
 		return getValue(smtpPW);
@@ -342,7 +355,9 @@ public final class Configuration {
 	}
 
 	/**
+	 * Gibt smtpPort zurück
 	 * @return
+	 * Text
 	 */
 	public final static String getsmtpPort() {
 		return getValue(smtpPort);
