@@ -2,8 +2,19 @@ import java.io.*;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
 
+import javax.activation.DataHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+
+import javax.swing.text.html.*;
+import javax.swing.text.html.parser.*;
+
+
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.parser.ParserDelegator;
 
 /**
  * 
@@ -31,7 +42,42 @@ public class RevieceMail {
 		this.FehlerText = "";
 		MailCounter = 0;
 	}
+	
 
+    private String leseMailInhalt(Part msg) throws Exception {
+
+    	String returni = "";
+    	
+        // get the content type of the part
+        String contentType = msg.getContentType();
+
+        // handle the part coresponding to its type
+        if (contentType.contains("multipart")) {
+            Multipart multipart = (Multipart) msg.getContent();
+            for (int j = 0; j < multipart.getCount(); j++) {
+                BodyPart bodyPart = multipart.getBodyPart(j);
+                	returni =  leseMailInhalt(bodyPart);                                 
+            }
+        }
+        else if (contentType.contains("text/plain")) {
+            returni =  (String)msg.getContent();
+        }
+        else if (contentType.contains("text/html")) {
+
+            //System.out.println((String)msg.getContent());
+            returni =  (String)msg.getContent();
+            returni = returni.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+            returni = returni.replaceAll("&nbsp;", " ");
+        }
+
+        else {
+
+        	returni = "Mail-Inhalt unlesbar";
+        }
+        return returni;
+    }
+
+    
 	/**
 	 * Versucht neue Mails zu empfangen
 	 * Gibt ArrayListe mit neuen Mails zurück (ohne zu speichern!)
@@ -71,11 +117,12 @@ public class RevieceMail {
 			Folder folder = store.getFolder("inbox");
 
 			// Open the Folder
-			folder.open(Folder.READ_WRITE);
+			folder.open(Folder.READ_ONLY);
 
 			// Get the messages from the server
 			Message[] messages = folder.getMessages();
 
+			System.out.println(messages.length);
 			// Display message
 			for (int i = 0; i < messages.length; i++) {
 
@@ -98,8 +145,11 @@ public class RevieceMail {
 				// System.out.println();
 				// This could lead to troubles if anything but text was sent
 				// System.out.println(msg.getContent());
-
-				MailStruktur mail = new MailStruktur(sent, from, subject, msg.getContent().toString(), null, null);
+				
+			
+			     
+			     
+				MailStruktur mail = new MailStruktur(sent, from, subject, leseMailInhalt(msg), null, null);
 				
 				newMailList.add(mail);
 				

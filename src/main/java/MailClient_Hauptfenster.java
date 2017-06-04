@@ -1,6 +1,6 @@
 
 /*
-Funktionen
+Implementiert
 Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 
 - Konfiguration von POP3 sowie SMTP Zugangsdaten 
@@ -9,13 +9,14 @@ Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 - Erstellen von neuen Mails und Senden via SMTP
 - Abholen von Mails von einem POP3 Server
 - Einsortieren von abgeholten Mails in einen Standard Ordner „Neue Mails“
-
-Für die Anbindung des Mailservers wird Ihnen im Moodle eine Bibliothek zur Verfügung gestellt.
-Optional können noch folgende Funktionen implementiert werden:
-- Verarbeitung von Attachments in empfangenen und gesendeten Mails
 - Automatisches Abholen per Zeitintervall
+
+
+ToDo:
 - Anlegen, Bearbeiten und Löschen von lokalen Mail Ordnern
 - Verschieben von Mails in einen existierenden Ordner
+- Verarbeitung von Attachments in empfangenen und gesendeten Mails
+
 
 */
 import java.awt.BorderLayout;
@@ -26,7 +27,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -35,6 +44,8 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
@@ -45,6 +56,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  * Hauptfenster vom MailClient
@@ -67,6 +79,32 @@ public class MailClient_Hauptfenster extends JFrame {
 	private JTable table_mailListe;
 
 	
+	// Auto-Runner
+	
+	ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+	boolean isSesRunning = false;
+	Runnable AutoRunner=new Runnable() {
+          @Override
+          public void run() {
+              try {
+            	  
+      			if(Configuration.getAnzahlminuten() <= 0)
+    			{
+    			System.out.println("Thread should die");
+    			ses.shutdownNow();
+    			isSesRunning = false;
+    			}else{
+                System.out.println("Ich bin gelaufen");
+                isSesRunning = true;
+    			}
+              }catch (Exception ex){
+                  ex.printStackTrace();
+            }
+          }
+	} ;
+	  
+	
+	
 	//private MailClient_Hauptfenster me = this;
 	
 
@@ -81,6 +119,16 @@ public class MailClient_Hauptfenster extends JFrame {
 			public void run() {				
 				changeOrdner(baum_strukt.getSelectionPath().toString());
 				refreshMailListe();				
+		
+
+				if(!isSesRunning && Configuration.getAnzahlminuten() > 0){
+					ses =  Executors.newScheduledThreadPool(1);
+					ses.scheduleAtFixedRate(new Thread(AutoRunner), 0, Configuration.getAnzahlminuten(), TimeUnit.SECONDS);
+				}
+				
+                baum_strukt.repaint();
+                baum_strukt.updateUI();
+
 				
 			}
 			
@@ -216,8 +264,15 @@ public class MailClient_Hauptfenster extends JFrame {
 				// JOptionPane.showMessageDialog(null, "Test" , "Test Titel",
 				// JOptionPane.OK_CANCEL_OPTION);
 				// hier Einstellungen aus dem Dialog auswerten
+				
+						
+					
+				if(isSesRunning) ses.shutdownNow();
+				
+				isSesRunning = false;
 				ShowSettingDialog();
-
+				
+				refreshGUI();
 			}
 		});
 		Extras.add(Einstellungen);
@@ -258,7 +313,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		
 		
 		// Neues Mail machen
-				Neuesmail = new JMenuItem("Einstellungen löschen");
+				Neuesmail = new JMenuItem("Einstellungen löschen und beenden");
 				Neuesmail.getAccessibleContext().setAccessibleDescription("Reset");
 				//Neuesmail.setMnemonic(KeyEvent.VK_N);
 				
@@ -266,8 +321,7 @@ public class MailClient_Hauptfenster extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 					 Configuration.deleteConfig();
-					 refreshGUI();
-					 
+					 System.exit(0);
 					}
 					
 				});
@@ -333,6 +387,8 @@ public class MailClient_Hauptfenster extends JFrame {
 						
 		});
 		
+		
+		/*
 		baum_strukt.addKeyListener(new KeyListener(){
 
 			@Override
@@ -361,7 +417,11 @@ public class MailClient_Hauptfenster extends JFrame {
 			}
 			
 		});
+		*/
 		
+		baum_strukt.setEditable(true);
+		baum_strukt.setComponentPopupMenu(getPopUpMenu());
+		baum_strukt.addMouseListener(getMouseListener());
 		
 		JScrollPane scroll = new JScrollPane(baum_strukt);
 
@@ -371,11 +431,192 @@ public class MailClient_Hauptfenster extends JFrame {
 	}
 
 	
+
+private MouseListener getMouseListener() {
+    return new MouseAdapter() {
+
+        @Override
+        public void mousePressed(MouseEvent arg0) {
+        	// mit Rechtsklick auch richtiges Element auswählen
+            if(arg0.getButton() == MouseEvent.BUTTON3){
+                TreePath pathForLocation = baum_strukt.getPathForLocation(arg0.getPoint().x, arg0.getPoint().y);
+                if(pathForLocation != null) baum_strukt.setSelectionPath(pathForLocation);               
+            }
+            super.mousePressed(arg0);
+        }
+    };
+}
+
+private JPopupMenu getPopUpMenu() {
+    JPopupMenu menu = new JPopupMenu();
+        
+    JMenuItem item2 = new JMenuItem("Neu");
+    item2.addActionListener(getAddActionListener());
+    menu.add(item2);
+    
+    JMenuItem item = new JMenuItem("Umbenennen");
+    item.addActionListener(getEditActionListener());
+    menu.add(item);
+
+    JMenuItem item3 = new JMenuItem("Loeschen");
+    item3.addActionListener(getDelActionListener());
+    menu.add(item3);
+    
+    return menu;
+}
+
+private ActionListener getAddActionListener() {
+    return new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            if(baum_strukt.getLastSelectedPathComponent() != null){
+            	
+            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+               if(node != null){
+            	   
+            	   String neuerOrdner = "";
+            	   
+            	   neuerOrdner = JOptionPane.showInputDialog("Name des neuen Ordners:");
+                   
+            	   if(neuerOrdner!=null && !neuerOrdner.isEmpty())
+            	   {
+		                DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
+		                
+		                try {
+							Configuration.createFolder(neuerOrdner, 0, ordnerHandler.getAktFolder());
+							node.add(n);
+						} catch (BackingStoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		               
+		                refreshGUI();
+            	   }
+               }
+            }
+        }
+    };
+}
+
+private ActionListener getEditActionListener() {
+    return new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            if(baum_strukt.getLastSelectedPathComponent() != null){
+            	
+            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+               if(node != null){
+            	   
+            	   String editOrdner = "";
+            	   
+            	   editOrdner = JOptionPane.showInputDialog("Neuer Name:");
+                   
+            	   if(editOrdner!=null && !editOrdner.isEmpty())
+            	   {
+		                //DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
+            		   
+            		   //ordnerHandler.getAktFolder().
+            		   try {
+						
+			                if(ordnerHandler.getAktFolder() != Configuration.getEingang() && 
+			                		ordnerHandler.getAktFolder() != Configuration.getGesendet() && 
+			                		ordnerHandler.getAktFolder() != Configuration.getFolders()
+			                		){
+			                	
+			                	Configuration.createFolder(editOrdner, 0, ordnerHandler.getAktFolder().parent());
+								Configuration.copyNode(ordnerHandler.getAktFolder(), ordnerHandler.getAktFolder().parent().node(editOrdner));
+								   node.setUserObject(editOrdner);
+					                ((DefaultTreeModel)baum_strukt.getModel()).nodeChanged(node);
+					                
+					                
+			                ordnerHandler.getAktFolder().removeNode();
+			                
+			                
+			                }
+			                
+					} catch (BackingStoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		   
+		             
+		               
+		               
+		                refreshGUI();
+            	   }
+               }
+            }
+        }
+    };
+}
+	
+
+
+
+private ActionListener getDelActionListener() {
+    return new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            if(baum_strukt.getLastSelectedPathComponent() != null){
+            	
+            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+               if(node != null){
+            	   
+            	   
+            	   int reply = JOptionPane.showConfirmDialog(null, "Wirklich loeschen mit allen Mails?", "Loeschen", JOptionPane.YES_NO_OPTION);
+            	   if (reply == JOptionPane.YES_OPTION)            	   
+            	   {
+		               
+            		   try {
+						
+			                if(ordnerHandler.getAktFolder() != Configuration.getEingang() && 
+			                		ordnerHandler.getAktFolder() != Configuration.getGesendet() && 
+			                		ordnerHandler.getAktFolder() != Configuration.getFolders()
+			                		){
+			                	
+			                	
+			                	   baum_strukt.setSelectionPath(new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
+								   baum_strukt.scrollPathToVisible(new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
+								
+								   
+								   node.removeAllChildren();
+								   node.removeFromParent();
+					             
+								   
+								   ((DefaultTreeModel)baum_strukt.getModel()).nodeChanged(node.getParent());
+					                			                
+			                ordnerHandler.getAktFolder().removeNode();
+			               
+			                
+//			                ordnerHandler.setGewaehlterMailOrdner(null);
+	                
+			                }
+			                
+					} catch (BackingStoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		   
+		             
+		               
+		               
+		                refreshGUI();
+            	   }
+               }
+            }
+        }
+    };
+}
+	
+
 	public void refreshMailListe() {	
 		mailHandler = new MailHandler(ordnerHandler.getAktFolder());
 		MailGrideModel.setNewData(mailHandler.getMailList());
 		MailGrideModel.fireTableDataChanged();
-	}
+		}
 	
 
 	public JScrollPane guiGetMailListe() {
@@ -474,6 +715,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		setSize(800, 600);
 		// Sichtbar machen
 		setVisible(true);
+		refreshGUI();
 	}
 
 	/**

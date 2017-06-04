@@ -16,7 +16,7 @@ public class OrdnerHandler {
 	private ArrayList<OrdnerStruktur> FolderList = new ArrayList<OrdnerStruktur>();
 	
 	// Default = Posteingang
-	private String gewaehlterMailOrdner = "[" + Configuration.getNameRootFolder() +", "+Configuration.getNamePosteingang() +"]";;
+	private String gewaehlterMailOrdner = "[" + Configuration.getNameRootFolder() +", "+Configuration.getNamePosteingang() +"]";
 	private Preferences aktFolder = null;
 	
 	
@@ -127,6 +127,10 @@ public class OrdnerHandler {
 	 * Name des neuen Ordners (Pfad in Baumstruktur)
 	 */
 	public void setGewaehlterMailOrdner(String gewaehlterMailOrdner) {
+		
+		if(gewaehlterMailOrdner == null) gewaehlterMailOrdner = "[" + Configuration.getNameRootFolder() +", "+Configuration.getNamePosteingang() +"]";
+		
+		
 		this.gewaehlterMailOrdner = gewaehlterMailOrdner;
 		System.out.println("-> Öffne Ordner: " + this.gewaehlterMailOrdner );	
 		FolderList = makeFolderList(null);

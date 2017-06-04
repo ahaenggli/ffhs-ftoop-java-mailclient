@@ -47,6 +47,10 @@ public final class Configuration {
 	private final static String smtpPW = "smtpPW";
 	private final static String smtpPort = "smtpPort";
 
+	// Diverses-Einstellungen
+	private final static String anzahlMinuten = "autoLadenMinuten";
+	
+	  
 	/*
 	 * Private Methoden für internen Klassen-internen gebrauch
 	 */
@@ -387,4 +391,38 @@ public final class Configuration {
 		return folders.node(NamePostausgang);
 	}
 
+	public final static Long getAnzahlminuten() {
+		Long min = (long) 0;
+		
+		try{
+			min = Long.parseLong(getValue(anzahlMinuten));
+		}catch(Exception e){
+			min = (long) 0;
+		}
+		return min;
+	}
+
+	/**
+	 * @param newValue
+	 * @return
+	 */
+	public final static boolean setAnzahlminuten(String newValue) {
+		return setValue(anzahlMinuten, newValue);
+	}
+
+	
+	public final static void copyNode(Preferences src, Preferences newNode) throws BackingStoreException {
+        if (src.childrenNames().length > 0) {
+            for (String child : src.childrenNames()) {
+                copyNode(src.node(child), newNode.node(child));
+            }
+        }
+        String[] keys = src.keys();
+        for (String key : keys) {
+            String value = src.get(key, "");
+            newNode.put(key, value);
+        }
+    }
+ 
+	
 }

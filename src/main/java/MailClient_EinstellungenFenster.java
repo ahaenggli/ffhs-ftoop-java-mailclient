@@ -156,6 +156,42 @@ public class MailClient_EinstellungenFenster extends JDialog {
 		// Hier werden die JPanels als Registerkarten hinzugefügt
 		tabpane.addTab("SMTP", panelBlue);
 
+		
+		
+		// Diverses
+		
+				// Raster erstellen
+				JLabel div_autoLaden= new JLabel("Mails alle x Minuten automatisch laden: ");
+	
+
+				JTextField div_autoLaden_Field = new JTextField(Configuration.getAnzahlminuten().toString(), 20);
+
+
+				div_autoLaden.setDisplayedMnemonic(KeyEvent.VK_S);
+				div_autoLaden.setLabelFor(pop3_serverField);
+	
+				panelGreen.add(div_autoLaden);
+				panelGreen.add(div_autoLaden_Field);
+
+	
+
+				JButton div_save = new JButton("Speichern");
+				div_save.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ev) {
+						Configuration.setAnzahlminuten(div_autoLaden_Field.getText());
+	
+						
+						if(Configuration.getDebug()) System.out.println("div_save-Einstellungen gespeichert");
+						
+					}
+				});
+
+				panelGreen.add(div_save);
+
+				
+		
+		
+		
 		tabpane.addTab("Diverses", panelGreen);
 
 		// JTabbedPane wird unserem Dialog hinzugefügt

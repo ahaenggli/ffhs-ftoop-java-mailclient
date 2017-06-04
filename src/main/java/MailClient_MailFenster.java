@@ -13,14 +13,15 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import javax.swing.WindowConstants;
+import javax.swing.border.LineBorder;
 
 public class MailClient_MailFenster extends JDialog {
 
@@ -28,7 +29,7 @@ public class MailClient_MailFenster extends JDialog {
 	private JTextField Kopie = new JTextField(30);
 	private JTextField Blindkopie = new JTextField(30);
 	private JTextField Betreff = new JTextField(30);	
-	private JTextPane Nachricht = new JTextPane();
+	private JEditorPane Nachricht = new JEditorPane();
 	
 	private JButton Sendenbutton = new JButton("Senden");
 	private JButton Antworten = new JButton("Antworten");
@@ -100,6 +101,8 @@ public class MailClient_MailFenster extends JDialog {
 		
 		Betreff.setText(betreff);
 		Nachricht.setText(nachricht);
+		
+		//Nachricht.setContentType( "text/html" );
 		Herkunft = hk;
 		//this.Parent = parent;
 		
@@ -167,7 +170,17 @@ public class MailClient_MailFenster extends JDialog {
 		
 		// send.addActionListener(new SendListener());
 	
-		alles.add(createComponentWithLabel("Nachricht:", Nachricht));
+		  //JEditorPane edtDTWinfo = new JEditorPane();
+		//Nachricht.setEditable(false);
+		//Nachricht.setBorder(new LineBorder(Color.ORANGE, 2));
+		//Nachricht.setForeground(Color.BLUE);
+		    JScrollPane spEditor = new JScrollPane(Nachricht,
+		            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		    spEditor.setPreferredSize(new Dimension(350, 200));
+		    
+		
+		alles.add(createComponentWithLabel("Nachricht:", spEditor));//new JScrollPane(Nachricht)));
 
 		
 		add(alles);
