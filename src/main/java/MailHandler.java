@@ -1,9 +1,5 @@
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -41,8 +37,6 @@ public class MailHandler {
 			OffenerOrnder.sync();
 			result = true;
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			result = false;
 		}
 		}
@@ -81,20 +75,14 @@ public class MailHandler {
 	public static boolean addMailToFolder(MailStruktur mail, Preferences folder){
 		boolean result = false;
 			
-		
-		System.out.println("Mail try add:");
-		
-		
-		
-		try {
 			String msg_name = "";
 			
-			if(mail.getID() == null) msg_name =  mail.newID();
+			if(mail.getID() == null) msg_name =  MailStruktur.newID();
 			else msg_name = mail.getID();
 			
 			if(!msg_name.startsWith("msg_")) msg_name = "msg_" + msg_name;
 		
-			Configuration.createFolder(msg_name, 0, folder);
+			if(Configuration.createFolder(msg_name, 0, folder)){
 			
 			
 			
@@ -103,26 +91,16 @@ public class MailHandler {
 			newNachricht.put("Betreff", mail.getBetreff());
 			newNachricht.putLong("Datum", mail.getDatum().getTime());
 			newNachricht.put("Nachricht", mail.getNachricht());
-			System.out.println("hier);");
+
 			newNachricht.put("Empfaenger", mail.getEmpfaenger());
 			newNachricht.put("CC", mail.getCC());
 			newNachricht.put("BCC", mail.getBCC());
-			
-			System.out.println(mail);
-			
-		//	newNachricht.putBoolean("doSend", mail.isDoSend());
-			
 			result = true;
-		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			result = false;
-		}
-		finally{
+			}
+			
+		
+		
 		return result;
-		}
-		
-		
 	}
 	
 
@@ -152,8 +130,7 @@ public class MailHandler {
 			
 			
 		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 		
 		
