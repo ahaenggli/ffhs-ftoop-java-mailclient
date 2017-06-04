@@ -46,26 +46,6 @@ class DataMailListTableModel extends AbstractTableModel {
 	public void setValueAt(Object value, int row, int col) {
 		MailStruktur macData = (m_macDataVector.get(row));
 
-		switch (col) {
-		/*
-		case 0:
-			macData.setDatum((Date) value);
-			break;
-		case 1:
-			macData.setAbsender((String) value);
-			break;
-		case 2:
-			macData.setBetreff((String) value);
-			break;
-		case 3:
-			macData.setNachricht((String) value);
-			break;
-		case 4:
-			macData.setID((String) value);
-			break;*/
-		default:
-			break;
-		}
 	}
 
 	public String getColumnName(int col) {

@@ -1,8 +1,6 @@
 
 /*
-Implementiert
-Ihre Anwendung muss mindestens folgende Funktionen implementieren:
-
+Implementiert:
 - Konfiguration von POP3 sowie SMTP Zugangsdaten 
 - Oeffnen einer Detailansicht von Mails in einem neuen Fenster mit Antwort/Weiterleitungsfunktion
 - Beantworten und weiterleiten von Mails
@@ -12,9 +10,7 @@ Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 - Automatisches Abholen per Zeitintervall
 - Anlegen, Bearbeiten und Löschen von lokalen Mail Ordnern
 
-ToDo:
-
-=======
+TODO:
 - Verschieben von Mails in einen existierenden Ordner
 - Verarbeitung von Attachments in empfangenen und gesendeten Mails
 
@@ -128,7 +124,7 @@ public class MailClient_Hauptfenster extends JFrame {
 				if (!isSesRunning && Configuration.getAnzahlminuten() > 0) {
 					ses = Executors.newScheduledThreadPool(1);
 					ses.scheduleAtFixedRate(new Thread(AutoRunner), 0, Configuration.getAnzahlminuten(),
-							TimeUnit.SECONDS);
+							TimeUnit.MINUTES);
 				}
 
 				baum_strukt.repaint();
@@ -148,20 +144,20 @@ public class MailClient_Hauptfenster extends JFrame {
 	 *            Gewaehlte Zeile
 	 * @return Herkunft von Mail
 	 */
-	public Object getSelectedMailListRow(Point evt, int colS) {
-		Object texti = "";
+	public int getSelectedMailListRow(Point evt, int colS) {
+		//int texti = "";
 
 		int row = table_mailListe.rowAtPoint(evt);
 		int col = table_mailListe.columnAtPoint(evt);
-		if (row >= 0 && col >= 0) {
+		/*if (row >= 0 && col >= 0) {
 
 			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS).toString();
 			if (colS == 5)
 				texti = mailHandler.getMailList().get(row).getHerkunft();
 
-		}
+		}*/
 
-		return texti;
+		return row;// texti;
 	}
 
 	/**
@@ -172,7 +168,8 @@ public class MailClient_Hauptfenster extends JFrame {
 	 */
 	public void changeOrdner(String neu) {
 		ordnerHandler.setGewaehlterMailOrdner(neu);
-		refreshGUI();
+		//refreshGUI();
+		refreshMailListe();
 
 	}
 
@@ -312,7 +309,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		Neuesmail.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new MailClient_MailFenster(null, "", "", "", null, 1);
+				new MailClient_MailFenster(new MailStruktur(), 1);
 			}
 
 		});
@@ -601,11 +598,16 @@ public class MailClient_Hauptfenster extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 
 				if (evt.getClickCount() == 2) {
-					new MailClient_MailFenster(null, (String) getSelectedMailListRow(evt.getPoint(), 2),
+					
+					
+					new MailClient_MailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint(), 0)), 0);
+					
+					/*
+					new MailClient_MailFenster(mailHandler.getMailList()[], (String) ,
 							(String) getSelectedMailListRow(evt.getPoint(), 3),
 							(String) getSelectedMailListRow(evt.getPoint(), 1),
 							(Preferences) getSelectedMailListRow(evt.getPoint(), 5), 0);
-
+*/
 				}
 			}
 		});

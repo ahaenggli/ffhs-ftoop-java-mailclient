@@ -112,7 +112,7 @@ public class ReceiveMail {
 				 */
 
 				// Mark this message for deletion when the session is closed
-				// msg.setFlag( Flags.Flag.DELETED, true ) ;
+				 msg.setFlag( Flags.Flag.DELETED, true ) ;
 			}
 
 			folder.close(true);

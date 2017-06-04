@@ -99,25 +99,23 @@ public class MailClient_MailFenster extends JDialog {
 		}
 	}
 
+
+
 	/**
-	 * Konstruktor fuer MailFenster
+	 * Konstruktor
 	 * 
-	 * @param parent
-	 * @param betreff
-	 * @param nachricht
-	 * @param empfaenger
-	 * @param hk
-	 * @param action
+	 * @param mailStruktur
 	 */
-	public MailClient_MailFenster(MailClient_Hauptfenster parent, String betreff, String nachricht, String empfaenger,
-			Preferences hk, int action) {
+	public MailClient_MailFenster(MailStruktur mailStruktur, int action) {
 		super();
 
-		Empfaenger.setText(empfaenger);
+		Empfaenger.setText(mailStruktur.getEmpfaenger());
 
-		Betreff.setText(betreff);
-		Nachricht.setText(nachricht);
-
+		Betreff.setText(mailStruktur.getBetreff());
+		Nachricht.setText(mailStruktur.getNachricht());
+		Kopie.setText(mailStruktur.getCC());
+		Blindkopie.setText(mailStruktur.getBCC());
+		
 		Aktion = action;
 
 		setTitle("Nachricht");
@@ -177,7 +175,6 @@ public class MailClient_MailFenster extends JDialog {
 		setModal(false);
 		// Fenster sichtbar machen
 		setVisible(true);
-
 	}
 
 	/**

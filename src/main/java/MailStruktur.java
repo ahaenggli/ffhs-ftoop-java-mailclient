@@ -65,6 +65,10 @@ public class MailStruktur {
 		// this.setDoSend(doSend);
 	}
 
+	public MailStruktur() {
+		
+	}
+
 	/**
 	 * Gib das Absendedatum
 	 * 
