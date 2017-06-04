@@ -4,17 +4,17 @@ Funktionen
 Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 
 - Konfiguration von POP3 sowie SMTP Zugangsdaten 
-- Öffnen einer Detailansicht von Mails in einem neuen Fenster mit Antwort/Weiterleitungsfunktion
+- ï¿½ffnen einer Detailansicht von Mails in einem neuen Fenster mit Antwort/Weiterleitungsfunktion
 - Beantworten und weiterleiten von Mails
 - Erstellen von neuen Mails und Senden via SMTP
 - Abholen von Mails von einem POP3 Server
-- Einsortieren von abgeholten Mails in einen Standard Ordner „Neue Mails“
+- Einsortieren von abgeholten Mails in einen Standard Ordner ï¿½Neue Mailsï¿½
 
-Für die Anbindung des Mailservers wird Ihnen im Moodle eine Bibliothek zur Verfügung gestellt.
-Optional können noch folgende Funktionen implementiert werden:
+Fï¿½r die Anbindung des Mailservers wird Ihnen im Moodle eine Bibliothek zur Verfï¿½gung gestellt.
+Optional kï¿½nnen noch folgende Funktionen implementiert werden:
 - Verarbeitung von Attachments in empfangenen und gesendeten Mails
 - Automatisches Abholen per Zeitintervall
-- Anlegen, Bearbeiten und Löschen von lokalen Mail Ordnern
+- Anlegen, Bearbeiten und Lï¿½schen von lokalen Mail Ordnern
 - Verschieben von Mails in einen existierenden Ordner
 
 */
@@ -115,7 +115,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	public void empfangeMails(){
 		
 		new SwingWorker(){
-			RevieceMail RevieceMailer = new RevieceMail();
+			ReceiveMail RevieceMailer = new ReceiveMail();
 			
 			@Override
 			protected Object doInBackground() throws Exception {
@@ -258,7 +258,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		
 		
 		// Neues Mail machen
-				Neuesmail = new JMenuItem("Einstellungen löschen");
+				Neuesmail = new JMenuItem("Einstellungen lï¿½schen");
 				Neuesmail.getAccessibleContext().setAccessibleDescription("Reset");
 				//Neuesmail.setMnemonic(KeyEvent.VK_N);
 				
@@ -280,7 +280,7 @@ public class MailClient_Hauptfenster extends JFrame {
 
 	
 	/**
-	 * Gibt Ordner-Bereich für linken Teil des GUI zurück
+	 * Gibt Ordner-Bereich fï¿½r linken Teil des GUI zurï¿½ck
 	 * @return
 	 */
 	private JScrollPane guiGetOrdner() {
@@ -292,7 +292,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		
 		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
 		
-		// Aktuelle Ordner auslesen und anhängen
+		// Aktuelle Ordner auslesen und anhï¿½ngen
 		addTreeChildren(OrdnerListe, ordnerHandler.getFolderList());		
 		
 		baum_strukt = new JTree(new DefaultTreeModel(OrdnerListe));
@@ -302,7 +302,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		
 		// Baum ausklappen
 		baum_strukt.expandPath(baum_strukt.getPathForRow(0));
-		//Erstes Element auswählen
+		//Erstes Element auswï¿½hlen
 		baum_strukt.setSelectionPath(baum_strukt.getPathForRow(1));
 		
 		// Was bei Auswahl von Ordner passieren soll
@@ -429,7 +429,7 @@ public class MailClient_Hauptfenster extends JFrame {
 				mailHandler.removeMail(mailHandler.getMailList().get(table_mailListe.convertRowIndexToModel(idx)).getHerkunft());
 				counter++;
 			}	
-			setStatusBarText(counter + " Mails gelöscht");
+			setStatusBarText(counter + " Mails gelï¿½scht");
 			refreshMailListe();
 		}
 		
@@ -461,27 +461,27 @@ public class MailClient_Hauptfenster extends JFrame {
 		// BorderLayout is the default for JFrame
 
 		/*
-		 *  Füge Komponenten zum Hauptschirm dazu
-		 *  Kompenenten werden in eigenen Methoden aufgebaut für 
-		 *  bessere Übersicht
+		 *  Fï¿½ge Komponenten zum Hauptschirm dazu
+		 *  Kompenenten werden in eigenen Methoden aufgebaut fï¿½r 
+		 *  bessere ï¿½bersicht
 		 */
 		add(guiGetMenu(), BorderLayout.NORTH);
 		add(guiGetOrdner(), BorderLayout.WEST);
 		add(guiGetMailListe(), BorderLayout.CENTER);
 		add(guiGetStatusBar(), BorderLayout.SOUTH);
 
-		// Fenstergrösse setzen
+		// Fenstergrï¿½sse setzen
 		setSize(800, 600);
 		// Sichtbar machen
 		setVisible(true);
 	}
 
 	/**
-	 * Hängt einem Ordner andere Ordner unter
+	 * Hï¿½ngt einem Ordner andere Ordner unter
 	 * @param parent
-	 * 			Diesem Element werden die anderen angehängt
+	 * 			Diesem Element werden die anderen angehï¿½ngt
 	 * @param Elements
-	 * 			Elemente zum anhängen
+	 * 			Elemente zum anhï¿½ngen
 	 */
 	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<OrdnerStruktur> Elements) {
 		if (Elements.size() > 0) {
