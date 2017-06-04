@@ -1,20 +1,22 @@
 import java.util.*;
 
 /**
- * Datenstruktir für einen Ornder
- * Wird meistens als als List bzw. Array gebraucht
+ * Datenstruktir für einen Ornder Wird meistens als als List bzw. Array
+ * gebraucht
+ * 
  * @author ahaen
  *
  */
 public class OrdnerStruktur implements Comparable<OrdnerStruktur> {
-	
+
 	private int SortNr;
 	private String Name;
 	private String AbsolutePath;
 	private ArrayList<OrdnerStruktur> Children;
 
 	/**
-	 * Konstruktor 
+	 * Konstruktor
+	 * 
 	 * @param SortNr
 	 * @param Name
 	 * @param AbsolutePath
@@ -27,19 +29,38 @@ public class OrdnerStruktur implements Comparable<OrdnerStruktur> {
 		this.AbsolutePath = AbsolutePath;
 	}
 
+	/**
+	 * SortNr ermitteln fuer Reihenfolge bei Sortierung und Baumstruktur (GUI)
+	 * 
+	 * @return Zahl
+	 */
 	public int getSortNr() {
 		return this.SortNr;
 	}
 
+	/**
+	 * Ordnername ermitteln
+	 * 
+	 * @return Text
+	 */
 	public String getName() {
 		return this.Name;
 	}
 
+	/**
+	 * Alle Unterordner ermitteln
+	 * 
+	 * @return Liste der Unterordner
+	 */
 	public ArrayList<OrdnerStruktur> getChildren() {
 		return this.Children;
 	}
 
-
+	/*
+	 * compareTo fuer Sortierung
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(OrdnerStruktur o) {
 		Integer a = Integer.valueOf(this.getSortNr());
@@ -48,10 +69,21 @@ public class OrdnerStruktur implements Comparable<OrdnerStruktur> {
 		return a.compareTo(b);
 	}
 
+	/**
+	 * Pfad ermitteln
+	 * 
+	 * @return Text
+	 */
 	public String getAbsolutePath() {
 		return AbsolutePath;
 	}
 
+	/**
+	 * Pfad setzen
+	 * 
+	 * @param absolutePath
+	 *            Wert fuer Pfad
+	 */
 	public void setAbsolutePath(String absolutePath) {
 		AbsolutePath = absolutePath;
 	}

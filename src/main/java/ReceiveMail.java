@@ -1,7 +1,5 @@
 import java.io.*;
 import java.util.*;
-import java.util.prefs.BackingStoreException;
-
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -13,17 +11,17 @@ import javax.mail.internet.*;
  */
 public class ReceiveMail {
 
-	// Fehlertext f�r StatusBar
+	// Fehlertext fuer StatusBar
 	private String FehlerText = "";
 
-	// Anzahl Empfangene Mails f�r Statusbar
+	// Anzahl Empfangene Mails fuer Statusbar
 	private int MailCounter = 0;
 
 	// Neue Mails als Liste
 	private ArrayList<MailStruktur> newMailList = new ArrayList<MailStruktur>();
 
 	private boolean Erfolg = false;
-	
+
 	/**
 	 * Konstruktur, setzt Werte zur�ck
 	 */
@@ -33,10 +31,11 @@ public class ReceiveMail {
 	}
 
 	/**
-	 * Versucht neue Mails zu empfangen
-	 * Gibt ArrayListe mit neuen Mails zur�ck (ohne zu speichern!)
+	 * Versucht neue Mails zu empfangen Gibt ArrayListe mit neuen Mails zurueck
+	 * (ohne zu speichern!)
+	 * 
 	 * @return true | false
-	 * 		
+	 * 
 	 */
 	public boolean getMails() {
 		Erfolg = false;
@@ -100,9 +99,12 @@ public class ReceiveMail {
 				// System.out.println(msg.getContent());
 
 				MailStruktur mail = new MailStruktur(sent, from, subject, msg.getContent().toString(), null, null);
-				
+
+				if (to != null && !to.isEmpty())
+					mail.setEmpfaenger(to);
+
 				newMailList.add(mail);
-				
+
 				MailCounter++;
 
 				/*
@@ -127,20 +129,48 @@ public class ReceiveMail {
 		return Erfolg;
 	}
 
-	public boolean getErfolg(){
+	/**
+	 * Ermittelt den Erfolg vom Empfangen
+	 * 
+	 * @return Efolg true|false
+	 */
+	public boolean getErfolg() {
 		return Erfolg;
 	}
+
+	/**
+	 * Gibt den Fehlertext zurueck
+	 * 
+	 * @return Fehlertext
+	 */
 	public String getFehlerText() {
 		return FehlerText;
 	}
 
+	/**
+	 * Anzahl empfangener Mails
+	 * 
+	 * @return Zahl
+	 */
 	public int getMailCounter() {
 		return MailCounter;
 	}
 
-	public ArrayList<MailStruktur> getnewMailList(){
+	/**
+	 * Liste der empfangenen Mails
+	 * 
+	 * @return
+	 */
+	public ArrayList<MailStruktur> getnewMailList() {
 		return newMailList;
 	}
+
+	/**
+	 * setzt den Fehlertext
+	 * 
+	 * @param fehlerText
+	 *            Neuer Wert fuer FehlerText
+	 */
 	public void setFehlerText(String fehlerText) {
 		FehlerText = fehlerText;
 	}
