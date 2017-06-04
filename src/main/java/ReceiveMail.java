@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.util.prefs.BackingStoreException;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -15,14 +17,15 @@ public class ReceiveMail {
 	 *
 	 * @param args
 	 *            Not used
+	 * @throws BackingStoreException 
 	 */
-	public ReceiveMail() {
+	public ReceiveMail() throws BackingStoreException {
 		// The IP address of the POP3 server
-		String host = aMailClient__Settings.getPop3Server();
+		String host = Configuration.getPop3Server();
 
 		// Username and password
-		String user = aMailClient__Settings.getPop3User();
-		String password = aMailClient__Settings.getPop3PW();
+		String user = Configuration.getPop3User();
+		String password = Configuration.getPop3PW();
 
 		// Get system properties
 		Properties properties = System.getProperties();
@@ -77,7 +80,7 @@ public class ReceiveMail {
 				//System.out.println(msg.getContent());
 
 				DataMailStrukur mail = new DataMailStrukur(sent, from, subject, msg.getContent().toString(), null, null);
-				DataHandler.addMailToFolder(mail, DataHandler.getEingang());
+				DataHandler.addMailToFolder(mail, Configuration.getEingang());
 
 				/*
 				 * In der endgueltigen Version sollen die Mails geloest werden

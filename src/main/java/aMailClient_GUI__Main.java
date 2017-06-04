@@ -20,6 +20,7 @@ Optional können noch folgende Funktionen implementiert werden:
 */
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.table.TableColumnModel;
@@ -193,7 +194,12 @@ public class aMailClient_GUI__Main extends JFrame {
 					public void run() {
 						(new Thread(){
 							public void run(){
-								new ReceiveMail();
+								try {
+									new ReceiveMail();
+								} catch (BackingStoreException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								refreshGUI();
 							}
 					}).start();

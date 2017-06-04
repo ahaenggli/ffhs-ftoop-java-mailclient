@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
 
 public class DataHandler {
 
-	private final static Preferences folders = aMailClient__Settings.getPrefs().node("Folders");
+    private final static Preferences folders = Configuration.getFolders();
 	private Preferences aktFolder = null;
 	
 	private ArrayList<DataMailFolderStruktur> FolderList = new ArrayList<DataMailFolderStruktur>();
@@ -49,7 +49,7 @@ public class DataHandler {
 			
 			if(!msg_name.startsWith("msg_")) msg_name = "msg_" + msg_name;
 		
-			createFolder(msg_name, 0, folder);
+			Configuration.createFolder(msg_name, 0, folder);
 
 			Preferences newNachricht = folder.node(msg_name);
 			newNachricht.put("Absender", mail.getAbsender());
@@ -67,10 +67,13 @@ public class DataHandler {
 		finally{
 		return result;
 		}
+		
+		
 	}
 	
+	/*
 	public static Preferences getEingang(){
-		return folders.node("Posteingang");
+		return folders.node("Neue Mails");
 	}
 	public static Preferences getGesendet(){
 		return folders.node("Gesendet");
@@ -81,6 +84,7 @@ public class DataHandler {
 			parent.node(Name).putInt("SortNr", SortNr);
 		}
 	}
+	*/
 
 	public void resetData() {
 		FolderList = new ArrayList<DataMailFolderStruktur>();
@@ -97,10 +101,7 @@ public class DataHandler {
 	public DataHandler() {
 		resetData();
 		try {
-			if (!folders.nodeExists("Posteingang"))
-				createFolder("Posteingang", 1, folders);
-			if (!folders.nodeExists("Gesendet"))
-				createFolder("Gesendet", 2, folders);
+
 			FolderList = getDataFolders(folders);
 		} catch (BackingStoreException e) {
 			// TODO Auto-generated catch block

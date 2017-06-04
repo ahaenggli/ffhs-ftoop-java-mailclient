@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
@@ -61,7 +62,7 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 				}
 			});	
 	}
-	private void sendeNachricht(){
+	private void sendeNachricht() throws BackingStoreException{
 		String e = Empfaenger.getText().trim();
 		String b = Betreff.getText().trim();
 		String n = Nachricht.getText().trim();
@@ -70,7 +71,7 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 		if(!e.isEmpty() && !b.isEmpty() && !n.isEmpty()){
 			
 			DataMailStrukur mail = new DataMailStrukur(new Date(), e, b, n, null, null);
-			DataHandler.addMailToFolder(mail, DataHandler.getGesendet());
+			DataHandler.addMailToFolder(mail, Configuration.getGesendet());
 			
 			new SendMail(e, b, n);
 					
@@ -99,7 +100,12 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 		Sendenbutton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				sendeNachricht();			
+				try {
+					sendeNachricht();
+				} catch (BackingStoreException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}			
 			}
 		});
 		
