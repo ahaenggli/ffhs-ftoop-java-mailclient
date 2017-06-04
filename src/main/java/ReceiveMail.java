@@ -11,12 +11,12 @@ import javax.mail.internet.*;
  *
  * @version 02-APR-2015
  */
-public class RevieceMail {
+public class ReceiveMail {
 
-	// Fehlertext für StatusBar
+	// Fehlertext fï¿½r StatusBar
 	private String FehlerText = "";
 
-	// Anzahl Empfangene Mails für Statusbar
+	// Anzahl Empfangene Mails fï¿½r Statusbar
 	private int MailCounter = 0;
 
 	// Neue Mails als Liste
@@ -25,16 +25,16 @@ public class RevieceMail {
 	private boolean Erfolg = false;
 	
 	/**
-	 * Konstruktur, setzt Werte zurück
+	 * Konstruktur, setzt Werte zurï¿½ck
 	 */
-	public RevieceMail() {
+	public ReceiveMail() {
 		this.FehlerText = "";
 		MailCounter = 0;
 	}
 
 	/**
 	 * Versucht neue Mails zu empfangen
-	 * Gibt ArrayListe mit neuen Mails zurück (ohne zu speichern!)
+	 * Gibt ArrayListe mit neuen Mails zurï¿½ck (ohne zu speichern!)
 	 * @return true | false
 	 * 		
 	 */
