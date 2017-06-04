@@ -8,18 +8,18 @@ Ihre Anwendung muss mindestens folgende Funktionen implementieren:
 - Beantworten und weiterleiten von Mails
 - Erstellen von neuen Mails und Senden via SMTP
 - Abholen von Mails von einem POP3 Server
-- Einsortieren von abgeholten Mails in einen Standard Ordner „Neue Mails“
+- Einsortieren von abgeholten Mails in einen Standard Ordner "Neue Mails"
 - Automatisches Abholen per Zeitintervall
 - Anlegen, Bearbeiten und Löschen von lokalen Mail Ordnern
 
 ToDo:
 
 =======
-- Verarbeitung von Attachments in empfangenen und gesendeten Mails
 - Verschieben von Mails in einen existierenden Ordner
-
+- Verarbeitung von Attachments in empfangenen und gesendeten Mails
 
 */
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -32,14 +32,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -61,182 +58,198 @@ import javax.swing.tree.TreePath;
 
 /**
  * Hauptfenster vom MailClient
+ * 
  * @author ahaen
  *
  */
 public class MailClient_Hauptfenster extends JFrame {
 
 	private static final long serialVersionUID = 8508453892315236372L;
-	
+
+	// GUI-wichtige Komponenten (Methodenuebergreifend)
 	private DefaultMutableTreeNode OrdnerListe = null;
 	private JTree baum_strukt = null;
 	private OrdnerHandler ordnerHandler = null;
-	
+
 	private DataMailListTableModel MailGrideModel = new DataMailListTableModel();
 	private MailHandler mailHandler = null;
-	
-	
+
 	private JLabel StatusBar = new JLabel("StatusBar");
 	private JTable table_mailListe;
 
-	
 	// Auto-Runner
-	
 	ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 	boolean isSesRunning = false;
-	Runnable AutoRunner=new Runnable() {
-          @Override
-          public void run() {
-              try {
-            	  
-      			if(Configuration.getAnzahlminuten() <= 0)
-    			{
-    			System.out.println("Thread should die");
-    			ses.shutdownNow();
-    			isSesRunning = false;
-    			}else{
-                System.out.println("Ich bin gelaufen");
-                isSesRunning = true;
-    			}
-              }catch (Exception ex){
-                  ex.printStackTrace();
-            }
-          }
-	} ;
-	  
-	
-	
-	//private MailClient_Hauptfenster me = this;
-	
+	Runnable AutoRunner = new Runnable() {
+		@Override
+		public void run() {
+			try {
 
+				if (Configuration.getAnzahlminuten() <= 0) {
+					if (Configuration.getDebug())
+						System.out.println("Thread should die");
+					ses.shutdownNow();
+					isSesRunning = false;
+				} else {
+					if (Configuration.getDebug())
+						System.out.println("Ich bin gelaufen");
+					isSesRunning = true;
+					empfangeMails();
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	};
+
+	/**
+	 * invokeLater mit Runnable, damit GUI nicht blockiert bei div. anderen
+	 * Methoden
+	 * 
+	 * @param run
+	 *            runnable
+	 */
 	public void addRunnable(Runnable run) {
 		EventQueue.invokeLater(run);
 	}
 
-	public void refreshGUI(){
-		addRunnable(new Runnable(){
+	/**
+	 * Aktualisiere GUI und Ordner Pruefe ob background-Thread fuer Mail empfang
+	 * aktiviert werden muss
+	 */
+	public void refreshGUI() {
+		addRunnable(new Runnable() {
 
 			@Override
-			public void run() {				
+			public void run() {
 				changeOrdner(baum_strukt.getSelectionPath().toString());
-				refreshMailListe();				
-		
+				refreshMailListe();
 
-				if(!isSesRunning && Configuration.getAnzahlminuten() > 0){
-					ses =  Executors.newScheduledThreadPool(1);
-					ses.scheduleAtFixedRate(new Thread(AutoRunner), 0, Configuration.getAnzahlminuten(), TimeUnit.SECONDS);
+				if (!isSesRunning && Configuration.getAnzahlminuten() > 0) {
+					ses = Executors.newScheduledThreadPool(1);
+					ses.scheduleAtFixedRate(new Thread(AutoRunner), 0, Configuration.getAnzahlminuten(),
+							TimeUnit.SECONDS);
 				}
-				
-                baum_strukt.repaint();
-                baum_strukt.updateUI();
 
-				
+				baum_strukt.repaint();
+				baum_strukt.updateUI();
+
 			}
-			
+
 		});
 	}
-	
-	
-	public Object getSelectedMailListRow(Point evt, int colS){
+
+	/**
+	 * Ermittle ausgewaehlte Mail fuer Antworten/Weiterleiten
+	 * 
+	 * @param evt
+	 *            Event
+	 * @param colS
+	 *            Gewaehlte Zeile
+	 * @return Herkunft von Mail
+	 */
+	public Object getSelectedMailListRow(Point evt, int colS) {
 		Object texti = "";
-		
+
 		int row = table_mailListe.rowAtPoint(evt);
 		int col = table_mailListe.columnAtPoint(evt);
 		if (row >= 0 && col >= 0) {
-			
-			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS)
-					.toString();
-			if(colS == 5)
-			texti = mailHandler.getMailList().get(row).getHerkunft();
-			
+
+			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS).toString();
+			if (colS == 5)
+				texti = mailHandler.getMailList().get(row).getHerkunft();
+
 		}
-		
+
 		return texti;
 	}
-	
+
+	/**
+	 * Wechsle Ordner und darum auch MailListe
+	 * 
+	 * @param neu
+	 *            Neuer Ordner von Baum
+	 */
 	public void changeOrdner(String neu) {
 		ordnerHandler.setGewaehlterMailOrdner(neu);
-		refreshMailListe();
-		
-		
+		refreshGUI();
+
 	}
 
-	public void empfangeMails(){
-		
-		new SwingWorker(){
+	/**
+	 * Rufe die Mails im Hintergrund ab
+	 */
+	public void empfangeMails() {
+
+		new SwingWorker<Object, Object>() {
 			ReceiveMail RevieceMailer = new ReceiveMail();
-			
+
 			@Override
 			protected Object doInBackground() throws Exception {
-				return RevieceMailer.getMails() ;				
+				return RevieceMailer.getMails();
 			}
-			
-			@Override
-			protected void done(){
-				if(	RevieceMailer.getErfolg() ){
-					setStatusBarText(RevieceMailer.getMailCounter() + " neue Mails empfangen");
-					
-					MailHandler.addMailToFolder(RevieceMailer.getnewMailList(), Configuration.getEingang());
-					
-				}
-				else setStatusBarText(RevieceMailer.getFehlerText());
-			}
-			
-		}.execute();
-		
-		
-	}
-	
-	public void setStatusBarText(String text){
-		
-		addRunnable(new Runnable(){
 
 			@Override
-			public void run() {		
+			protected void done() {
+				if (RevieceMailer.getErfolg()) {
+					setStatusBarText(RevieceMailer.getMailCounter() + " neue Mails empfangen");
+
+					MailHandler.addMailToFolder(RevieceMailer.getnewMailList(), Configuration.getEingang());
+
+				} else
+					setStatusBarText(RevieceMailer.getFehlerText());
+			}
+
+		}.execute();
+
+	}
+
+	/**
+	 * Setze den StatusBar-Text
+	 * 
+	 * @param text
+	 *            Wert fuer StatusBar
+	 */
+	public void setStatusBarText(String text) {
+
+		addRunnable(new Runnable() {
+
+			@Override
+			public void run() {
 				StatusBar.setText(text);
 				StatusBar.updateUI();
-				
+
 				changeOrdner(baum_strukt.getSelectionPath().toString());
-				refreshMailListe();	
-				
+				refreshMailListe();
+
 			}
-			
+
 		});
-		
-		
-		
-		
-	}
-	
-	
-	public JLabel guiGetStatusBar() {
 
-		return StatusBar;
 	}
 
+	/**
+	 * Zeige Dialog fuer Einstellungen
+	 */
 	public void ShowSettingDialog() {
 		new MailClient_EinstellungenFenster();
 	}
 
 	/**
 	 * Menu aufbauen, ganz oben in Client
+	 * 
 	 * @return Menubar
 	 */
 	private JMenuBar guiGetMenu() {
 
-		// Where the GUI is created:
-		JMenuBar menuBar;
+		JMenuBar menuBar = new JMenuBar();
+		;
 		JMenu Datei, Extras;
 		JMenuItem menuItem, Einstellungen, Aktualisieren, Neuesmail;
-
-
-		// Create the menu bar.
-		menuBar = new JMenuBar();
 
 		// Datei
 		Datei = new JMenu("Datei");
 		Datei.setMnemonic(KeyEvent.VK_D);
-		Datei.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
 
 		menuBar.add(Datei);
 
@@ -244,7 +257,6 @@ public class MailClient_Hauptfenster extends JFrame {
 		menuItem.setMnemonic(KeyEvent.VK_B);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 
-		
 		menuItem.addActionListener(actionEvent -> System.exit(0));
 		Datei.add(menuItem);
 
@@ -253,7 +265,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		Extras.getAccessibleContext().setAccessibleDescription("Extras");
 		menuBar.add(Extras);
 
-		// Build second menu in the menu bar.
+		// Einstellungen
 		Einstellungen = new JMenuItem("Einstellungen");
 		Einstellungen.getAccessibleContext().setAccessibleDescription("Einstellungen bearbeiten");
 		Einstellungen.setMnemonic(KeyEvent.VK_E);
@@ -262,17 +274,15 @@ public class MailClient_Hauptfenster extends JFrame {
 		Einstellungen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 
-				// JOptionPane.showMessageDialog(null, "Test" , "Test Titel",
-				// JOptionPane.OK_CANCEL_OPTION);
-				// hier Einstellungen aus dem Dialog auswerten
-				
-						
-					
-				if(isSesRunning) ses.shutdownNow();
-				
+				// Stoppe Background thread, es koennte ja Einstellung geaendert
+				// werden
+				if (isSesRunning)
+					ses.shutdownNow();
+
 				isSesRunning = false;
 				ShowSettingDialog();
-				
+
+				// GUI aktualisieren
 				refreshGUI();
 			}
 		});
@@ -283,16 +293,14 @@ public class MailClient_Hauptfenster extends JFrame {
 		Aktualisieren.getAccessibleContext().setAccessibleDescription("Mails empfangen");
 		Aktualisieren.setMnemonic(KeyEvent.VK_M);
 		Aktualisieren.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.ALT_MASK));
-		Aktualisieren.addActionListener(new ActionListener(){
+		Aktualisieren.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
+
 				empfangeMails();
-				
-		
-				
+
 			}
-			
+
 		});
 		Extras.add(Aktualisieren);
 
@@ -300,131 +308,85 @@ public class MailClient_Hauptfenster extends JFrame {
 		Neuesmail = new JMenuItem("Neue Nachricht");
 		Neuesmail.getAccessibleContext().setAccessibleDescription("Neue Nachricht schreiben");
 		Neuesmail.setMnemonic(KeyEvent.VK_N);
-		
-		Neuesmail.addActionListener(new ActionListener(){
+
+		Neuesmail.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new MailClient_MailFenster(null, "", "", "", null, 1);				
+				new MailClient_MailFenster(null, "", "", "", null, 1);
 			}
-			
+
 		});
 		Extras.add(Neuesmail);
-		
-		
-		
-		
-		// Neues Mail machen
 
-				Neuesmail = new JMenuItem("Einstellungen löschen und beenden");
-				Neuesmail.getAccessibleContext().setAccessibleDescription("Reset");
-				//Neuesmail.setMnemonic(KeyEvent.VK_N);
-				
-				Neuesmail.addActionListener(new ActionListener(){
-					@Override
-					public void actionPerformed(ActionEvent e) {
-					 Configuration.deleteConfig();
-					 System.exit(0);
-					}
-					
-				});
-				Extras.add(Neuesmail);
-				
-				
+		// Einstellungen löschen
+
+		Neuesmail = new JMenuItem("Einstellungen löschen und beenden");
+		Neuesmail.getAccessibleContext().setAccessibleDescription("Reset");
+		// Neuesmail.setMnemonic(KeyEvent.VK_N);
+
+		Neuesmail.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Configuration.deleteConfig();
+				System.exit(0);
+			}
+
+		});
+		Extras.add(Neuesmail);
+
 		return menuBar;
 	}
 
-
-	
 	/**
-	 * Gibt Ordner-Bereich fï¿½r linken Teil des GUI zurï¿½ck
+	 * Gibt Ordner-Bereich fuer linken Teil des GUI zurueck
+	 * 
 	 * @return
 	 */
 	private JScrollPane guiGetOrdner() {
 
 		// Ordner laden/aktualisieren
 		// Cache/Variable leeren
-		OrdnerListe = new DefaultMutableTreeNode(Configuration.getNameRootFolder()); 		
+		OrdnerListe = new DefaultMutableTreeNode(Configuration.getNameRootFolder());
 		ordnerHandler = new OrdnerHandler();
-		
+
 		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
-		
+
 		// Aktuelle Ordner auslesen und anhï¿½ngen
-		addTreeChildren(OrdnerListe, ordnerHandler.getFolderList());		
-		
+		addTreeChildren(OrdnerListe, ordnerHandler.getFolderList());
+
 		baum_strukt = new JTree(new DefaultTreeModel(OrdnerListe));
-		
+
 		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
-		
-		
+
 		// Baum ausklappen
 		baum_strukt.expandPath(baum_strukt.getPathForRow(0));
-		//Erstes Element auswï¿½hlen
+		// Erstes Element auswaehlen
 		baum_strukt.setSelectionPath(baum_strukt.getPathForRow(1));
-		
+
 		// Was bei Auswahl von Ordner passieren soll
-
-
-		//baum_strukt.addTreeSelectionListener(tsList);
 		baum_strukt.addTreeSelectionListener(new TreeSelectionListener() {
 
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getNewLeadSelectionPath()
 						.getLastPathComponent();
-				
-				if(Configuration.getDebug())
-				System.out.println(node);
+
+				if (Configuration.getDebug())
+					System.out.println(node);
 
 				addRunnable(new Runnable() {
 					public void run() {
 						changeOrdner(e.getNewLeadSelectionPath().toString());
-						//refreshTreeStruct();
-						// refreshGUI();
-
-						// refreshTreeStruct();
 					}
 				});
 
-				// System.out.println( e.getNewLeadSelectionPath()) ;
 			}
-						
+
 		});
-		
-		
-		/*
-		baum_strukt.addKeyListener(new KeyListener(){
 
-			@Override
-			public void keyPressed(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-				if(Configuration.getDebug())
-					System.out.println(	e.getKeyCode() );
-					
-					if(e.getKeyCode() == KeyEvent.VK_DELETE)
-					System.out.println("todo: Delete");
-					
-				
-			}
-
-			@Override
-			public void keyTyped(KeyEvent k) {
-				// TODO Auto-generated method stub
-		
-			}
-			
-		});
-		*/
-		
 		baum_strukt.setEditable(true);
 		baum_strukt.setComponentPopupMenu(getPopUpMenu());
 		baum_strukt.addMouseListener(getMouseListener());
-		
+
 		JScrollPane scroll = new JScrollPane(baum_strukt);
 
 		scroll.setPreferredSize(new Dimension(250, 500));
@@ -432,195 +394,200 @@ public class MailClient_Hauptfenster extends JFrame {
 		return scroll;
 	}
 
-	
+	/**
+	 * MouseListener fuer Auswahl rechte Maustaste in Ordner-Baum
+	 * 
+	 * @return
+	 */
+	private MouseListener getMouseListener() {
+		return new MouseAdapter() {
 
-private MouseListener getMouseListener() {
-    return new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// mit Rechtsklick auch richtiges Element auswählen
+				if (arg0.getButton() == MouseEvent.BUTTON3) {
+					TreePath pathForLocation = baum_strukt.getPathForLocation(arg0.getPoint().x, arg0.getPoint().y);
+					if (pathForLocation != null)
+						baum_strukt.setSelectionPath(pathForLocation);
+				}
+				super.mousePressed(arg0);
+			}
+		};
+	}
 
-        @Override
-        public void mousePressed(MouseEvent arg0) {
-        	// mit Rechtsklick auch richtiges Element auswählen
-            if(arg0.getButton() == MouseEvent.BUTTON3){
-                TreePath pathForLocation = baum_strukt.getPathForLocation(arg0.getPoint().x, arg0.getPoint().y);
-                if(pathForLocation != null) baum_strukt.setSelectionPath(pathForLocation);               
-            }
-            super.mousePressed(arg0);
-        }
-    };
-}
+	/**
+	 * Context-Menu fuer Baum-Elemente
+	 * 
+	 * @return JPopupMenu
+	 */
+	private JPopupMenu getPopUpMenu() {
+		JPopupMenu menu = new JPopupMenu();
 
-private JPopupMenu getPopUpMenu() {
-    JPopupMenu menu = new JPopupMenu();
-        
-    JMenuItem item2 = new JMenuItem("Neu");
-    item2.addActionListener(getAddActionListener());
-    menu.add(item2);
-    
-    JMenuItem item = new JMenuItem("Umbenennen");
-    item.addActionListener(getEditActionListener());
-    menu.add(item);
+		JMenuItem item2 = new JMenuItem("Neu");
+		item2.addActionListener(getAddActionListener());
+		menu.add(item2);
 
-    JMenuItem item3 = new JMenuItem("Loeschen");
-    item3.addActionListener(getDelActionListener());
-    menu.add(item3);
-    
-    return menu;
-}
+		JMenuItem item = new JMenuItem("Umbenennen");
+		item.addActionListener(getEditActionListener());
+		menu.add(item);
 
-private ActionListener getAddActionListener() {
-    return new ActionListener() {
+		JMenuItem item3 = new JMenuItem("Loeschen");
+		item3.addActionListener(getDelActionListener());
+		menu.add(item3);
 
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            if(baum_strukt.getLastSelectedPathComponent() != null){
-            	
-            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
-               if(node != null){
-            	   
-            	   String neuerOrdner = "";
-            	   
-            	   neuerOrdner = JOptionPane.showInputDialog("Name des neuen Ordners:");
-                   
-            	   if(neuerOrdner!=null && !neuerOrdner.isEmpty())
-            	   {
-		                DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
-		                
-		                try {
-							Configuration.createFolder(neuerOrdner, 0, ordnerHandler.getAktFolder());
-							node.add(n);
-						} catch (BackingStoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+		return menu;
+	}
+
+	/**
+	 * Ordner hinzuefuegen in Baum
+	 * 
+	 * @return
+	 */
+	private ActionListener getAddActionListener() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (baum_strukt.getLastSelectedPathComponent() != null) {
+
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					if (node != null) {
+
+						String neuerOrdner = "";
+
+						neuerOrdner = JOptionPane.showInputDialog("Name des neuen Ordners:");
+
+						if (neuerOrdner != null && !neuerOrdner.isEmpty()) {
+							DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
+
+							if (Configuration.createFolder(neuerOrdner, 0, ordnerHandler.getAktFolder()))
+								node.add(n);
+
+							refreshGUI();
 						}
-		               
-		                refreshGUI();
-            	   }
-               }
-            }
-        }
-    };
-}
-
-private ActionListener getEditActionListener() {
-    return new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            if(baum_strukt.getLastSelectedPathComponent() != null){
-            	
-            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
-               if(node != null){
-            	   
-            	   String editOrdner = "";
-            	   
-            	   editOrdner = JOptionPane.showInputDialog("Neuer Name:");
-                   
-            	   if(editOrdner!=null && !editOrdner.isEmpty())
-            	   {
-		                //DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
-            		   
-            		   //ordnerHandler.getAktFolder().
-            		   try {
-						
-			                if(ordnerHandler.getAktFolder() != Configuration.getEingang() && 
-			                		ordnerHandler.getAktFolder() != Configuration.getGesendet() && 
-			                		ordnerHandler.getAktFolder() != Configuration.getFolders()
-			                		){
-			                	
-			                	Configuration.createFolder(editOrdner, 0, ordnerHandler.getAktFolder().parent());
-								Configuration.copyNode(ordnerHandler.getAktFolder(), ordnerHandler.getAktFolder().parent().node(editOrdner));
-								   node.setUserObject(editOrdner);
-					                ((DefaultTreeModel)baum_strukt.getModel()).nodeChanged(node);
-					                
-					                
-			                ordnerHandler.getAktFolder().removeNode();
-			                
-			                
-			                }
-			                
-					} catch (BackingStoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
-            		   
-		             
-		               
-		               
-		                refreshGUI();
-            	   }
-               }
-            }
-        }
-    };
-}
-	
+				}
+			}
+		};
+	}
 
+	/**
+	 * Ordnername bearbeiten in Baum
+	 * 
+	 * @return
+	 */
+	private ActionListener getEditActionListener() {
+		return new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (baum_strukt.getLastSelectedPathComponent() != null) {
 
-private ActionListener getDelActionListener() {
-    return new ActionListener() {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					if (node != null) {
 
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            if(baum_strukt.getLastSelectedPathComponent() != null){
-            	
-            	DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
-               if(node != null){
-            	   
-            	   
-            	   int reply = JOptionPane.showConfirmDialog(null, "Wirklich loeschen mit allen Mails?", "Loeschen", JOptionPane.YES_NO_OPTION);
-            	   if (reply == JOptionPane.YES_OPTION)            	   
-            	   {
-		               
-            		   try {
-						
-			                if(ordnerHandler.getAktFolder() != Configuration.getEingang() && 
-			                		ordnerHandler.getAktFolder() != Configuration.getGesendet() && 
-			                		ordnerHandler.getAktFolder() != Configuration.getFolders()
-			                		){
-			                	
-			                	
-			                	   baum_strukt.setSelectionPath(new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
-								   baum_strukt.scrollPathToVisible(new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
-								
-								   
-								   node.removeAllChildren();
-								   node.removeFromParent();
-					             
-								   
-								   ((DefaultTreeModel)baum_strukt.getModel()).nodeChanged(node.getParent());
-					                			                
-			                ordnerHandler.getAktFolder().removeNode();
-			               
-			                
-//			                ordnerHandler.setGewaehlterMailOrdner(null);
-	                
-			                }
-			                
-					} catch (BackingStoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						String editOrdner = "";
+
+						editOrdner = JOptionPane.showInputDialog("Neuer Name:");
+
+						if (editOrdner != null && !editOrdner.isEmpty()) {
+							// DefaultMutableTreeNode n = new
+							// DefaultMutableTreeNode(neuerOrdner);
+
+							// ordnerHandler.getAktFolder().
+							try {
+
+								if (ordnerHandler.getAktFolder() != Configuration.getEingang()
+										&& ordnerHandler.getAktFolder() != Configuration.getGesendet()
+										&& ordnerHandler.getAktFolder() != Configuration.getFolders()) {
+
+									Configuration.createFolder(editOrdner, 0, ordnerHandler.getAktFolder().parent());
+									Configuration.copyNode(ordnerHandler.getAktFolder(),
+											ordnerHandler.getAktFolder().parent().node(editOrdner));
+									node.setUserObject(editOrdner);
+									((DefaultTreeModel) baum_strukt.getModel()).nodeChanged(node);
+
+									ordnerHandler.getAktFolder().removeNode();
+
+								}
+
+							} catch (BackingStoreException e) {
+
+							}
+
+							refreshGUI();
+						}
 					}
-            		   
-		             
-		               
-		               
-		                refreshGUI();
-            	   }
-               }
-            }
-        }
-    };
-}
-	
+				}
+			}
+		};
+	}
 
-	public void refreshMailListe() {	
+	/**
+	 * Ordner loeschen in Baum
+	 * 
+	 * @return
+	 */
+	private ActionListener getDelActionListener() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (baum_strukt.getLastSelectedPathComponent() != null) {
+
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					if (node != null) {
+
+						int reply = JOptionPane.showConfirmDialog(null, "Wirklich loeschen mit allen Mails?",
+								"Loeschen", JOptionPane.YES_NO_OPTION);
+						if (reply == JOptionPane.YES_OPTION) {
+
+							try {
+
+								if (ordnerHandler.getAktFolder() != Configuration.getEingang()
+										&& ordnerHandler.getAktFolder() != Configuration.getGesendet()
+										&& ordnerHandler.getAktFolder() != Configuration.getFolders()) {
+
+									baum_strukt.setSelectionPath(
+											new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
+									baum_strukt.scrollPathToVisible(
+											new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
+
+									node.removeAllChildren();
+									node.removeFromParent();
+
+									((DefaultTreeModel) baum_strukt.getModel()).nodeChanged(node.getParent());
+
+									ordnerHandler.getAktFolder().removeNode();
+
+								}
+
+							} catch (BackingStoreException e) {
+
+							}
+
+							refreshGUI();
+						}
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * MailListe aktualisieren
+	 */
+	private void refreshMailListe() {
 		mailHandler = new MailHandler(ordnerHandler.getAktFolder());
 		MailGrideModel.setNewData(mailHandler.getMailList());
 		MailGrideModel.fireTableDataChanged();
-		}
-	
+	}
 
+	/**
+	 * MailListe aufbauen fur GUI
+	 * 
+	 * @return JScrollPane
+	 */
 	public JScrollPane guiGetMailListe() {
 
 		refreshMailListe();
@@ -628,58 +595,55 @@ private ActionListener getDelActionListener() {
 		table_mailListe.setFillsViewportHeight(true);
 		table_mailListe.setAutoCreateRowSorter(true);
 		table_mailListe.setDefaultEditor(Object.class, null);
-		
+
 		table_mailListe.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
-		
+
 				if (evt.getClickCount() == 2) {
-					new MailClient_MailFenster( null,
-							(String) getSelectedMailListRow(evt.getPoint(), 2), 
-							(String) getSelectedMailListRow(evt.getPoint(), 3), 
+					new MailClient_MailFenster(null, (String) getSelectedMailListRow(evt.getPoint(), 2),
+							(String) getSelectedMailListRow(evt.getPoint(), 3),
 							(String) getSelectedMailListRow(evt.getPoint(), 1),
-							(Preferences) getSelectedMailListRow(evt.getPoint(), 5), 
-							0);
-					
+							(Preferences) getSelectedMailListRow(evt.getPoint(), 5), 0);
+
 				}
 			}
 		});
-	
-		table_mailListe.addKeyListener(new KeyListener(){
+
+		table_mailListe.addKeyListener(new KeyListener() {
 
 			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-		
+			public void keyReleased(KeyEvent e) {
+
+				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+
+					// e.get
+					if (table_mailListe.getSelectedRow() > -1) {
+						int counter = 0;
+						for (int idx : table_mailListe.getSelectedRows()) {
+							mailHandler.removeMail(mailHandler.getMailList()
+									.get(table_mailListe.convertRowIndexToModel(idx)).getHerkunft());
+							counter++;
+						}
+						setStatusBarText(counter + " Mails geloescht");
+						refreshGUI();
+					}
+
+				}
 			}
 
 			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
+			public void keyPressed(KeyEvent arg0) {
+			// nicht verwendet
 				
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-		if(e.getKeyCode() == KeyEvent.VK_DELETE){
-					
-					//e.get
-		if(table_mailListe.getSelectedRow() > -1)
-		{			
-			int counter = 0;
-			for(int idx :	table_mailListe.getSelectedRows()){
-				mailHandler.removeMail(mailHandler.getMailList().get(table_mailListe.convertRowIndexToModel(idx)).getHerkunft());
-				counter++;
-			}	
-			setStatusBarText(counter + " Mails gelï¿½scht");
-			refreshMailListe();
-		}
-		
-		//			refreshGUI();
-				} //else System.out.println(e.getKeyCode());
+			public void keyTyped(KeyEvent arg0) {
+				//nicht verwendet
+				
 			}
-			
+
 		});
 
 		TableColumnModel tcm = table_mailListe.getColumnModel();
@@ -687,33 +651,33 @@ private ActionListener getDelActionListener() {
 		tcm.removeColumn(tcm.getColumn(3));
 
 		JScrollPane scroll = new JScrollPane(table_mailListe);
-		// JScrollPane scrollPane = new JScrollPane(m_simpleTable);
-		// getContentPane().add(scrollPane);
 
 		return scroll;
 	}
 
+	/**
+	 * Konstruktor
+	 */
 	public MailClient_Hauptfenster() {
 
 		// JFrame aufbauen und Titel setzen
 		super(Configuration.getMailClientName());
-		
+
 		// Was passiert beim Schliessen?
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// BorderLayout is the default for JFrame
 
 		/*
-		 *  Fï¿½ge Komponenten zum Hauptschirm dazu
-		 *  Kompenenten werden in eigenen Methoden aufgebaut fï¿½r 
-		 *  bessere ï¿½bersicht
+		 * Fuege Komponenten zum Hauptschirm dazu Kompenenten werden in eigenen
+		 * Methoden aufgebaut fuer bessere uebersicht
 		 */
 		add(guiGetMenu(), BorderLayout.NORTH);
 		add(guiGetOrdner(), BorderLayout.WEST);
 		add(guiGetMailListe(), BorderLayout.CENTER);
-		add(guiGetStatusBar(), BorderLayout.SOUTH);
+		add(StatusBar, BorderLayout.SOUTH);
 
-		// Fenstergrï¿½sse setzen
+		// Fenstergroesse setzen
 		setSize(800, 600);
 		// Sichtbar machen
 		setVisible(true);
@@ -721,22 +685,22 @@ private ActionListener getDelActionListener() {
 	}
 
 	/**
-	 * Hï¿½ngt einem Ordner andere Ordner unter
+	 * Haengt einem Ordner andere Ordner unter
+	 * 
 	 * @param parent
-	 * 			Diesem Element werden die anderen angehï¿½ngt
+	 *            Diesem Element werden die anderen angehaengt
 	 * @param Elements
-	 * 			Elemente zum anhï¿½ngen
+	 *            Elemente zum anhaengen
 	 */
 	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<OrdnerStruktur> Elements) {
 		if (Elements.size() > 0) {
-			
+
 			System.out.println("Anzahl Elemente: " + Elements.size());
-			
+
 			for (OrdnerStruktur Element : Elements) {
-			
+
 				System.out.println("Element: " + Element.getName());
-				
-				
+
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(Element.getName());
 
 				addTreeChildren(child, Element.getChildren());
@@ -748,12 +712,10 @@ private ActionListener getDelActionListener() {
 	}
 
 	/**
-	 * The program starts here. Note that it will not terminate when the main
-	 * method terminates. This is because some background threads are started
-	 * for the GUI.
+	 * main-Methode fuer Programmstart
 	 *
 	 * @param args
-	 *            Not used
+	 *            nicht verwendet
 	 */
 	public static void main(String args[]) {
 		new MailClient_Hauptfenster();
