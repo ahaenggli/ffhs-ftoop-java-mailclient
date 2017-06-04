@@ -11,15 +11,38 @@ import javax.mail.internet.*;
  *
  * @version 02-APR-2015
  */
-public class ReceiveMail {
+public class RevieceMail {
+
+	// Fehlertext für StatusBar
+	private String FehlerText = "";
+
+	// Anzahl Empfangene Mails für Statusbar
+	private int MailCounter = 0;
+
+	// Neue Mails als Liste
+	private ArrayList<MailStruktur> newMailList = new ArrayList<MailStruktur>();
+
+	private boolean Erfolg = false;
+	
 	/**
-	 * Receives a text email.
-	 *
-	 * @param args
-	 *            Not used
-	 * @throws BackingStoreException 
+	 * Konstruktur, setzt Werte zurück
 	 */
-	public ReceiveMail() throws BackingStoreException {
+	public RevieceMail() {
+		this.FehlerText = "";
+		MailCounter = 0;
+	}
+
+	/**
+	 * Versucht neue Mails zu empfangen
+	 * Gibt ArrayListe mit neuen Mails zurück (ohne zu speichern!)
+	 * @return true | false
+	 * 		
+	 */
+	public boolean getMails() {
+		Erfolg = false;
+
+		setFehlerText("Empfang fehlgeschlagen");
+
 		// The IP address of the POP3 server
 		String host = Configuration.getPop3Server();
 
@@ -59,28 +82,28 @@ public class ReceiveMail {
 				Message msg = messages[i];
 
 				String from = InternetAddress.toString(msg.getFrom());
-				//if (from != null) 					System.out.println("From: " + from);
-				
+				// if (from != null) System.out.println("From: " + from);
 
 				String to = InternetAddress.toString(msg.getRecipients(Message.RecipientType.TO));
-				//if (to != null) 					System.out.println("To: " + to);
-				
+				// if (to != null) System.out.println("To: " + to);
 
 				String subject = msg.getSubject();
-				//if (subject != null) 					System.out.println("Subject: " + subject);
-				
+				// if (subject != null) System.out.println("Subject: " +
+				// subject);
 
 				Date sent = msg.getSentDate();
-				//if (sent != null) 					System.out.println("Sent: " + sent);
-				
+				// if (sent != null) System.out.println("Sent: " + sent);
 
 				// Empty line to separate header from body
-				//System.out.println();
+				// System.out.println();
 				// This could lead to troubles if anything but text was sent
-				//System.out.println(msg.getContent());
+				// System.out.println(msg.getContent());
 
-				DataMailStrukur mail = new DataMailStrukur(sent, from, subject, msg.getContent().toString(), null, null);
-				DataHandler.addMailToFolder(mail, Configuration.getEingang());
+				MailStruktur mail = new MailStruktur(sent, from, subject, msg.getContent().toString(), null, null);
+				
+				newMailList.add(mail);
+				
+				MailCounter++;
 
 				/*
 				 * In der endgueltigen Version sollen die Mails geloest werden
@@ -92,8 +115,33 @@ public class ReceiveMail {
 
 			folder.close(true);
 			store.close();
-		} catch (MessagingException | IOException e) {
-			e.printStackTrace();
+			Erfolg = true;
+		} catch (MessagingException e) {
+			setFehlerText("MessagingException: Stimmen die POP3-Benutzerdaten und haben Sie Internet?");
+		} catch (IOException e) {
+			setFehlerText("Fehler: IOException");
+		} catch (Exception e) {
+			setFehlerText("Fehler: unerwartete Exception");
 		}
+
+		return Erfolg;
+	}
+
+	public boolean getErfolg(){
+		return Erfolg;
+	}
+	public String getFehlerText() {
+		return FehlerText;
+	}
+
+	public int getMailCounter() {
+		return MailCounter;
+	}
+
+	public ArrayList<MailStruktur> getnewMailList(){
+		return newMailList;
+	}
+	public void setFehlerText(String fehlerText) {
+		FehlerText = fehlerText;
 	}
 }

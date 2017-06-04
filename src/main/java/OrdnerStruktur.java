@@ -1,12 +1,26 @@
 import java.util.*;
 
-public class DataMailFolderStruktur implements Comparable<DataMailFolderStruktur> {
+/**
+ * Datenstruktir für einen Ornder
+ * Wird meistens als als List bzw. Array gebraucht
+ * @author ahaen
+ *
+ */
+public class OrdnerStruktur implements Comparable<OrdnerStruktur> {
+	
 	private int SortNr;
 	private String Name;
 	private String AbsolutePath;
-	private ArrayList<DataMailFolderStruktur> Children;
+	private ArrayList<OrdnerStruktur> Children;
 
-	public DataMailFolderStruktur(int SortNr, String Name, String AbsolutePath, ArrayList<DataMailFolderStruktur> Children) {
+	/**
+	 * Konstruktor 
+	 * @param SortNr
+	 * @param Name
+	 * @param AbsolutePath
+	 * @param Children
+	 */
+	public OrdnerStruktur(int SortNr, String Name, String AbsolutePath, ArrayList<OrdnerStruktur> Children) {
 		this.SortNr = SortNr;
 		this.Name = Name;
 		this.Children = Children;
@@ -21,21 +35,13 @@ public class DataMailFolderStruktur implements Comparable<DataMailFolderStruktur
 		return this.Name;
 	}
 
-	public ArrayList<DataMailFolderStruktur> getChildren() {
+	public ArrayList<OrdnerStruktur> getChildren() {
 		return this.Children;
 	}
 
-	/*
-	 * @Override public int compareTo(DataFolderList o1, DataFolderList o2) {
-	 * Integer a = ((DataFolderList) o1).getSortNr(); Integer b =
-	 * ((DataFolderList) o2).getSortNr();
-	 * 
-	 * return a.compareTo(b); }
-	 * 
-	 */
 
 	@Override
-	public int compareTo(DataMailFolderStruktur o) {
+	public int compareTo(OrdnerStruktur o) {
 		Integer a = Integer.valueOf(this.getSortNr());
 		Integer b = Integer.valueOf(o.getSortNr());
 

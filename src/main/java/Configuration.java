@@ -20,12 +20,21 @@ public final class Configuration {
 	 * Declare der private Variablen und fixen Wert (initial) setzen
 	 */
 
+	// Name des MailClients
+	private static final String MailClientName = "Bananaa MailClient";
+	
 	// Hauptzweig (Root) vom Gesamten MailClient-Datenspeicher.
-	private final static Preferences prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
+	private static Preferences prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
 
 	// Hier liegen die Mailordner und Mails drin
-	private final static Preferences folders = getPrefs().node("Folders");
-
+	private static final String NameRootFolder = "Folders";
+	private static Preferences folders = getPrefs().node(NameRootFolder);	
+	private static final String NamePosteingang = "Neue Mails";
+	private static final String NamePostausgang = "Gesendet";
+	
+	// Debug Params für Sys-Outputs
+	private static boolean Debug = true;
+	
 	// pop3-Einstellungen (Mail senden)
 	private final static String POP3Server = "POP3Server";
 	private final static String POP3User = "POP3User";
@@ -109,6 +118,41 @@ public final class Configuration {
 	 */
 
 	/**
+	 * Löscht alle Daten
+	 */
+	public final static void deleteConfig()
+	{
+		try {
+			prefs.removeNode();
+			prefs.flush();
+			 prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
+	/** 
+	 * Gibt den MailClientName zurück
+	 * @return MailClientName
+	 */
+	public final static String getMailClientName()
+	{
+		return MailClientName;
+	}
+	
+	/**
+	 * Gibt zurück ob Debug Aufruf oder nicht
+	 * @return true|false
+	 */
+	public final static boolean getDebug(){
+		return Debug;
+	}
+	
+	/**
 	 * Gibt das Root-Verzeichnis der Einstellungen zurück
 	 * 
 	 * @return Preferences mit Einstellungs-Root
@@ -123,9 +167,47 @@ public final class Configuration {
 	 * @return Preferences mit Mailordner
 	 */
 	public final static Preferences getFolders() {
+		
+		
+		// Sicherstellen, dass Ein- und Ausgang existieren
+		try {
+			getEingang();
+			getGesendet();
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 		return folders;
 	}
 
+	
+	/**
+	 * Gibt den Namen des Postausgangs zurück
+	 * @return Name von Postausgang
+	 */
+	public final static String getNamePostausgang(){
+		return  NamePostausgang;
+	}
+	
+	/**
+	 * Gibt den Namen des Posteingang zurück
+	 * @return Name von Posteingang
+	 */
+	public final static String getNamePosteingang(){
+		return NamePosteingang;
+	}
+	
+	/**
+	 * Gibt den Namen des NameRootFolder zurück
+	 * @return Name von NameRootFolder
+	 */
+	public final static String getNameRootFolder(){
+		return NameRootFolder;
+	}
+	
 	/*
 	 * POP 3 Einstellungen lesen/schreiben für andere Klassen/Methoden
 	 */
@@ -260,19 +342,36 @@ public final class Configuration {
 		return setValue(smtpPort, newValue);
 	}
 
+	
+	public static Preferences getOrdner(String x, Preferences parent) throws BackingStoreException{
+		
+		if(parent == null) parent = folders;
+		
+		if (!parent.nodeExists(x))
+			createFolder(x, 1, parent);
+
+		
+		return parent.node(x);
+	}
+	
 	/**
 	 * Gibt Standard-Verzeichnis für Neue Mails
 	 * 
 	 * @return Preferences
 	 * @throws BackingStoreException 
 	 */
-	public static Preferences getEingang() throws BackingStoreException {
+	public static Preferences getEingang() {
 		
-		if (!folders.nodeExists("Neue Mails"))
-			createFolder("Neue Mails", 1, folders);
+		try {
+			if (!folders.nodeExists(NamePosteingang))
+				createFolder(NamePosteingang, 1, folders);
+		} catch (BackingStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		
-		return folders.node("Neue Mails");
+		return folders.node(NamePosteingang);
 	}
 
 	/**
@@ -283,9 +382,9 @@ public final class Configuration {
 	 */
 	public static Preferences getGesendet() throws BackingStoreException {
 		
-		if (!folders.nodeExists("Gesendet"))
-			createFolder("Gesendet", 2, folders);
-		return folders.node("Gesendet");
+		if (!folders.nodeExists(NamePostausgang))
+			createFolder(NamePostausgang, 2, folders);
+		return folders.node(NamePostausgang);
 	}
 
 }

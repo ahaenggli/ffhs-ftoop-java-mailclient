@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -21,7 +22,7 @@ import javax.swing.JTextPane;
 
 import javax.swing.WindowConstants;
 
-public class aMailClient_GUI_MailFenster extends JDialog {
+public class MailClient_MailFenster extends JDialog {
 
 	private JTextField Empfaenger = new JTextField(30);
 	private JTextField Kopie = new JTextField(30);
@@ -32,12 +33,12 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 	private JButton Sendenbutton = new JButton("Senden");
 	private JButton Antworten = new JButton("Antworten");
 	private JButton Weiterleiten = new JButton("Weiterleiten");
-	private JButton Loeschen = new JButton("Loeschen");
+	//private JButton Loeschen = new JButton("Loeschen");
 	
 	private boolean isAW = false;
 	private boolean isWG = false;
 	private Preferences Herkunft;
-	private aMailClient_GUI__Main Parent;
+	//private MailClient_Hauptfenster Parent;
 	
 	private JPanel alles;
 	
@@ -70,15 +71,29 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 		
 		if(!e.isEmpty() && !b.isEmpty() && !n.isEmpty()){
 			
-			DataMailStrukur mail = new DataMailStrukur(new Date(), e, b, n, null, null);
-			DataHandler.addMailToFolder(mail, Configuration.getGesendet());
+			MailStruktur mail = new MailStruktur(new Date(), Configuration.getsmtpUser(), b, n, null, null);
+			mail.setEmpfaenger(e);
+			mail.setBCC(Blindkopie.getText().trim());
+			mail.setCC(Kopie.getText().trim());
 			
-			new SendMail(e, b, n);
-					
+			SendMail mailSender = new SendMail();
+			mailSender.send(mail);
+			
+			if(mailSender.getErfolg()){
+				System.out.println("hier");
+			MailHandler.addMailToFolder(mail, Configuration.getGesendet());
 			dispose();
+			}
+			else{
+				JLabel err = new JLabel(mailSender.getFehlerText());
+				//err.setFont(new Font("red"));
+				err.setForeground(Color.red);
+				alles.add(err);
+				alles.updateUI();
+			}
 		}
 	}
-	public aMailClient_GUI_MailFenster(aMailClient_GUI__Main parent, String betreff, String nachricht, String empfaenger, Preferences hk, int action) {
+	public MailClient_MailFenster(MailClient_Hauptfenster parent, String betreff, String nachricht, String empfaenger, Preferences hk, int action) {
 		super();
 
 		Empfaenger.setText(empfaenger);
@@ -86,7 +101,7 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 		Betreff.setText(betreff);
 		Nachricht.setText(nachricht);
 		Herkunft = hk;
-		this.Parent = parent;
+		//this.Parent = parent;
 		
 		Aktion = action;
 		
@@ -132,7 +147,7 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 		
 		alles.add(Weiterleiten);
 		
-		
+		/*
 		Loeschen.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -140,7 +155,7 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 			}
 		});
 		
-		alles.add(Loeschen);
+		alles.add(Loeschen);*/
 	
 		
 		alles.add(createComponentWithLabel("Empfaenger / Absender:", Empfaenger));
@@ -188,11 +203,11 @@ public class aMailClient_GUI_MailFenster extends JDialog {
 			
 		} 
 		else if(Aktion == 4){
-			DataHandler.removeMail(Herkunft);
+			//MailHandler.removeMail(Herkunft);
 			
 			
 
-			Parent.refreshGUI();
+			//Parent.refreshGUI();
 			
 			
 			dispose();

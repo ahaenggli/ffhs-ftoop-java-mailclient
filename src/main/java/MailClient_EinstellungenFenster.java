@@ -15,13 +15,21 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-public class aMailClient_GUI_Einstellungen extends JDialog {
+/**
+ * Fenster um die ganzen  Einstellungen zu ändern
+ * @author ahaen
+ *
+ */
+public class MailClient_EinstellungenFenster extends JDialog {
 
 	
 
 	private static final long serialVersionUID = -8439476419298094881L;
 
-	public aMailClient_GUI_Einstellungen() {
+	/**
+	 * Konstruktor mit GUI
+	 */
+	public MailClient_EinstellungenFenster() {
 		super();
 		//super("adriano's MailClient - Einstellungen");
 		// Set the default behaviour for the close button
@@ -31,6 +39,7 @@ public class aMailClient_GUI_Einstellungen extends JDialog {
 		//JDialog meinJDialog = new JDialog();
 		setTitle("Einstellungen");
 		setSize(450, 300);
+		// Bei Klick auf X schliessen
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		JPanel panelGreen = new JPanel();
@@ -82,6 +91,9 @@ public class aMailClient_GUI_Einstellungen extends JDialog {
 				Configuration.setPop3User(pop3_usernameField.getText());
 				Configuration.setPop3PW(new String(pop3_passwordField.getPassword()));
 				Configuration.setPop3Port(pop3_portField.getText());
+				
+				if(Configuration.getDebug()) System.out.println("POP3-Einstellungen gespeichert");
+				
 			}
 		});
 
@@ -131,6 +143,11 @@ public class aMailClient_GUI_Einstellungen extends JDialog {
 				Configuration.setsmtpUser(smtp_usernameField.getText());
 				Configuration.setsmtpPW(new String(smtp_passwordField.getPassword()));
 				Configuration.setsmtpPort(smtp_portField.getText());
+				
+				
+				if(Configuration.getDebug()) System.out.println("SMTP-Einstellungen gespeichert");
+				
+				
 			}
 		});
 
@@ -143,7 +160,8 @@ public class aMailClient_GUI_Einstellungen extends JDialog {
 
 		// JTabbedPane wird unserem Dialog hinzugefügt
 		add(tabpane);
-		// Wir lassen unseren Dialog anzeigen
+		
+		// Wir lassen unseren Dialog anzeigen und nix anderes
 		setModal(true);
 		setVisible(true);
 		
