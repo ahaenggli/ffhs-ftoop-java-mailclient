@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -11,36 +12,45 @@ import javax.swing.table.AbstractTableModel;
  */
 class DataMailListTableModel extends AbstractTableModel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6659022226302820746L;
 
-	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID" };
-	// public Class[] m_colTypes = { String.class, String.class, String.class,
-	// String.class, String.class};
-
-	private ArrayList<MailStruktur> m_macDataVector;
+	private String[] SpaltenNamen_Normal = { "Datum", "Absender", "Betreff" };
+	private String[] SpaltenNamen_Postausgang = { "Datum", "Empfaenger", "Betreff" };
+	
+	private Preferences  gewaehlterOrdner = null;
+	private ArrayList<MailStruktur> tmpMail;
 
 	public DataMailListTableModel() {
 		super();
 	}
+	
+	public void changeOrdner(Preferences Ordner){
+		this.gewaehlterOrdner = Ordner;		
+	}
+	public DataMailListTableModel(Preferences Ordner) {		
+		super();
+		this.gewaehlterOrdner = Ordner;
+	}
+	
 
 	public DataMailListTableModel(ArrayList<MailStruktur> tmpMailList) {
 		super();
-		m_macDataVector = tmpMailList;
+		tmpMail = tmpMailList;
 	}
 
 	public void setNewData(ArrayList<MailStruktur> tmpMailList) {
-		m_macDataVector = tmpMailList;
+		tmpMail = tmpMailList;
 	}
 
 	public int getColumnCount() {
-		return m_colNames.length;
+		if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+			return SpaltenNamen_Postausgang.length;
+		else
+		return SpaltenNamen_Normal.length;
 	}
 
 	public int getRowCount() {
-		return m_macDataVector.size();
+		return tmpMail.size();
 	}
 
 	public void setValueAt(Object value, int row, int col) {
@@ -49,19 +59,26 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public String getColumnName(int col) {
-		return m_colNames[col];
+		if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+			return SpaltenNamen_Postausgang[col];
+		else
+			return SpaltenNamen_Normal[col];
 	}
 
 	/*
 	 * public Class getColumnClass(int col) { return m_colTypes[col]; }
 	 */
 	public Object getValueAt(int row, int col) {
-		MailStruktur macData = (m_macDataVector.get(row));
+		MailStruktur macData = (tmpMail.get(row));
 
+		
 		switch (col) {
 		case 0:
 			return macData.getDatum().toString();
 		case 1:
+			if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+			return macData.getEmpfaenger();
+			else
 			return macData.getAbsender();
 		case 2:
 			return macData.getBetreff();
