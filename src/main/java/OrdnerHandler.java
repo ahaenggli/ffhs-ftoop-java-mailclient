@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -67,9 +66,11 @@ public class OrdnerHandler {
 
 				p = "[" + p.replace("/", ", ") + "]";
 
+				if(Configuration.getDebug()){
 				System.out.println("--> Vergleichspfad: " + p);
 				System.out.println("--> Suchenderpfad : " + gewaehlterMailOrdner);
-
+				}
+				
 				// startet nicht mit "msg_", somit Ordner und weitermachen
 				if (!child.name().startsWith("msg_")) {
 
@@ -91,7 +92,8 @@ public class OrdnerHandler {
 
 			}
 		} catch (BackingStoreException e) {
-
+			if(Configuration.getDebug())
+				e.printStackTrace();
 		}
 
 		//ArrayList.sort(tmpList);
