@@ -20,28 +20,38 @@ class DataMailListTableModel extends AbstractTableModel {
 	private Preferences gewaehlterOrdner = null;
 	private ArrayList<MailStruktur> tmpMail;
 
+	/**
+	 * Konstruktor
+	 */
 	public DataMailListTableModel() {
 		super();
 	}
 
+	/**
+	 * Wechselt Ordner, der gerade angezeigt wird
+	 * 
+	 * @param Ordner
+	 *            Ordner, der gerade angezeigt wird
+	 */
 	public void changeOrdner(Preferences Ordner) {
 		this.gewaehlterOrdner = Ordner;
 	}
 
-	public DataMailListTableModel(Preferences Ordner) {
-		super();
-		this.gewaehlterOrdner = Ordner;
-	}
-
-	public DataMailListTableModel(ArrayList<MailStruktur> tmpMailList) {
-		super();
-		tmpMail = tmpMailList;
-	}
-
+	/**
+	 * setter Fuer die MailListe im Ordner
+	 * 
+	 * @param tmpMailList
+	 *            Liste der Mail im aktuellen Ordner
+	 */
 	public void setNewData(ArrayList<MailStruktur> tmpMailList) {
 		tmpMail = tmpMailList;
 	}
 
+	/*
+	 * (non-Javadoc) Ermittelt Anzahl der Spalten
+	 * 
+	 * @see javax.swing.table.TableModel#getColumnCount()
+	 */
 	public int getColumnCount() {
 		if (gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
 			return SpaltenNamen_Postausgang.length;
@@ -49,15 +59,20 @@ class DataMailListTableModel extends AbstractTableModel {
 			return SpaltenNamen_Normal.length;
 	}
 
+	/*
+	 * (non-Javadoc) Ermittelt die Anzahl an Zeilen (= Anzahl Mails)
+	 * 
+	 * @see javax.swing.table.TableModel#getRowCount()
+	 */
 	public int getRowCount() {
 		return tmpMail.size();
 	}
 
-	public void setValueAt(Object value, int row, int col) {
-		// MailStruktur macData = (m_macDataVector.get(row));
-
-	}
-
+	/*
+	 * (non-Javadoc) Gibt die Spalten-Namen zurueck, je nach Ordner
+	 * 
+	 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+	 */
 	public String getColumnName(int col) {
 		if (gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
 			return SpaltenNamen_Postausgang[col];

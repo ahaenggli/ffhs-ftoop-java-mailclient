@@ -13,12 +13,22 @@ public class SendMail {
 	private boolean Erfolg = false;
 	private MailStruktur mail = null;
 
-	public String getFehlerText() {
-		return FehlerText;
-	}
-
+	/**
+	 * Ermittelt den Erfolg vom Senden
+	 * 
+	 * @return Efolg true|false
+	 */
 	public boolean getErfolg() {
 		return Erfolg;
+	}
+
+	/**
+	 * Gibt den Fehlertext zurueck
+	 * 
+	 * @return Fehlertext
+	 */
+	public String getFehlerText() {
+		return FehlerText;
 	}
 
 	/**
@@ -30,7 +40,7 @@ public class SendMail {
 	}
 
 	/**
-	 * Sendet eine Mail
+	 * Wrapper fuer send() mit Angabe von Mail
 	 *
 	 * @param newMail
 	 *            Mail zum senden
@@ -41,6 +51,11 @@ public class SendMail {
 		return send();
 	}
 
+	/**
+	 * Sendet eine Mail
+	 *
+	 * @return Erfolg ja|nein
+	 */
 	public boolean send() {
 		Erfolg = false;
 
