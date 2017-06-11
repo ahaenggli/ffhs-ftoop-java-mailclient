@@ -34,6 +34,10 @@ public class MailHandler {
 				OffenerOrnder.sync();
 				result = true;
 			} catch (BackingStoreException e) {
+
+				if (Configuration.isDebug())
+					e.printStackTrace();
+
 				result = false;
 			}
 		}
@@ -122,6 +126,8 @@ public class MailHandler {
 			}
 
 		} catch (BackingStoreException e) {
+			if (Configuration.isDebug())
+				e.printStackTrace();
 
 		}
 

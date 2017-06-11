@@ -2,13 +2,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -16,6 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
@@ -38,7 +37,7 @@ public class MailClient_MailFenster extends JDialog {
 	private JButton Antworten = new JButton("Antworten");
 	private JButton Weiterleiten = new JButton("Weiterleiten");
 
-	private JLabel err = new JLabel("");
+	private JLabel lbl_Status = new JLabel("");
 	private JLabel EmpfAbs = new JLabel("Empfaenger/Absender:");
 
 	private boolean isAW = false;
@@ -54,6 +53,32 @@ public class MailClient_MailFenster extends JDialog {
 
 	private int Aktion = 0;
 
+	public void setlbl_Status(String neu, Color fg) {
+		if (neu != null)
+			lbl_Status.setText(neu);
+		lbl_Status.setForeground(fg);
+		lbl_Status.updateUI();
+	}
+
+	/**
+	 * Setzt Aktion neu
+	 * 
+	 * @param neu
+	 *            Neue Zahl fuer Aktion
+	 */
+	public void setAktion(int neu) {
+		this.Aktion = neu;
+	}
+
+	/**
+	 * Ermittelt die Aktion
+	 * 
+	 * @return Aktion als Zahl
+	 */
+	public int getAktion() {
+		return Aktion;
+	}
+
 	/**
 	 * Aendere Aktion
 	 * 
@@ -61,10 +86,10 @@ public class MailClient_MailFenster extends JDialog {
 	 *            Zahl 0-4
 	 */
 	public void changeAction(final int act) {
-		EventQueue.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				Aktion = act;
+				setAktion(act);
 				doAction();
 			}
 		});
@@ -73,9 +98,8 @@ public class MailClient_MailFenster extends JDialog {
 	/**
 	 * Versuche eine Nachricht zu senden, bei Fehler kommt roter Text in GUI
 	 * 
-	 * @throws BackingStoreException
 	 */
-	private void sendeNachricht() throws BackingStoreException {
+	public void sendeNachricht() {
 		String e = Empfaenger.getText().trim();
 		String b = Betreff.getText().trim();
 		String n = Nachricht.getText().trim();
@@ -87,27 +111,24 @@ public class MailClient_MailFenster extends JDialog {
 			mail.setBCC(Blindkopie.getText().trim());
 			mail.setCC(Kopie.getText().trim());
 
-			new SwingWorker<Object, Object>() {
+			new SwingWorker<Boolean, Object>() {
 				SendMail mailSender = new SendMail();
 
 				@Override
-				protected Object doInBackground() throws Exception {
-					err.setText("Versuche das Mail zu senden...");
-					err.setForeground(Color.black);
-
+				protected Boolean doInBackground() throws Exception {
+					setlbl_Status("Versuche das Mail zu senden...", Color.BLACK);
 					changeAction(0);
-					return mailSender.send(mail);
+					return Boolean.valueOf(mailSender.send(mail));
 				}
 
 				@Override
 				protected void done() {
 					if (mailSender.getErfolg()) {
-						System.out.println("hier");
+						//System.out.println("hier");
 						MailHandler.addMailToFolder(mail, Configuration.getGesendet());
 						dispose();
 					} else {
-						err.setText(mailSender.getFehlerText());
-						err.setForeground(Color.red);
+						setlbl_Status(mailSender.getFehlerText(), Color.RED);
 						changeAction(1);
 					}
 
@@ -158,11 +179,8 @@ public class MailClient_MailFenster extends JDialog {
 		Sendenbutton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					sendeNachricht();
-				} catch (BackingStoreException e1) {
+				sendeNachricht();
 
-				}
 			}
 		});
 
@@ -193,13 +211,13 @@ public class MailClient_MailFenster extends JDialog {
 
 		Nachricht.setPreferredSize(new Dimension(350, 200));
 
-		JScrollPane spEditor = new JScrollPane(Nachricht, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane spEditor = new JScrollPane(Nachricht, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		spEditor.setPreferredSize(new Dimension(350, 200));
 
 		alles.add(macheLabelZuKomponente("Nachricht:", spEditor));// new
 																	// JScrollPane(Nachricht)));
-		alles.add(err);
+		alles.add(lbl_Status);
 
 		add(alles);
 		doAction();
@@ -212,7 +230,7 @@ public class MailClient_MailFenster extends JDialog {
 	/**
 	 * Mach was, je nach Aufrufart
 	 */
-	private void doAction() {
+	public void doAction() {
 		boolean setter = false;
 
 		if (Aktion == 0) {
@@ -281,10 +299,10 @@ public class MailClient_MailFenster extends JDialog {
 	 *            Komponente, die belabelt werden soll
 	 * @return JPane mit Label und Ursprungskomponente
 	 */
-	private JPanel macheLabelZuKomponente(String label, Component comp) {
+	private static JPanel macheLabelZuKomponente(String label, Component comp) {
 		label.trim();
 
-		JLabel lbl = new JLabel(label + " ", JLabel.LEFT);
+		JLabel lbl = new JLabel(label + " ", SwingConstants.LEFT);
 		lbl.setName("lbl_" + label.replace(":", ""));
 
 		return macheLabelZuKomponente(lbl, comp);
@@ -300,9 +318,9 @@ public class MailClient_MailFenster extends JDialog {
 	 *            Komponente, die belabelt werden soll
 	 * @return JPane mit Label und Ursprungskomponente
 	 */
-	private JPanel macheLabelZuKomponente(JLabel label, Component comp) {
+	private static JPanel macheLabelZuKomponente(JLabel label, Component comp) {
 		JPanel p = new JPanel();
-		label.setHorizontalAlignment(JLabel.LEFT);
+		label.setHorizontalAlignment(SwingConstants.LEFT);
 		p.setLayout(new BorderLayout());
 		p.add(label, BorderLayout.PAGE_START);
 		p.add(comp, BorderLayout.CENTER);

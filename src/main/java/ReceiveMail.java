@@ -123,10 +123,21 @@ public class ReceiveMail {
 			store.close();
 			Erfolg = true;
 		} catch (MessagingException e) {
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 			setFehlerText("MessagingException: Stimmen die POP3-Benutzerdaten und haben Sie Internet?");
 		} catch (IOException e) {
+
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 			setFehlerText("Fehler: IOException");
 		} catch (Exception e) {
+
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 			setFehlerText("Fehler: unerwartete Exception");
 		}
 

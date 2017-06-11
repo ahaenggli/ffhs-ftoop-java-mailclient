@@ -18,7 +18,6 @@ TODO:
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +31,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -47,9 +49,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.TableColumnModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**
@@ -98,6 +100,10 @@ public class MailClient_Hauptfenster extends JFrame {
 		}
 	};
 
+	public TreePath getSelectedPath() {
+		return baum_strukt.getSelectionPath();
+	}
+
 	/**
 	 * invokeLater mit Runnable, damit GUI nicht blockiert bei div. anderen
 	 * Methoden
@@ -133,13 +139,74 @@ public class MailClient_Hauptfenster extends JFrame {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				new MailClient_MailFenster(fms, fParam);
+				JDialog jd = new MailClient_MailFenster(fms, fParam);
+				jd.setVisible(true);
 			}
 
 		};
 
 		SwingUtilities.invokeLater(r);
 
+	}
+
+	/**
+	 * Ermittle TreePahth an Koordinate
+	 * 
+	 * @param x
+	 *            X-Koorinate aus GUI
+	 * @param y
+	 *            Y-Koordinate aus GUI
+	 * @return TreePath von Auswahl
+	 */
+	public TreePath getPathInBaumStrukt(int x, int y) {
+		return baum_strukt.getPathForLocation(x, y);
+	}
+
+	/**
+	 * Scrolle/Oeffne Baum an gewuenschten Ort
+	 * 
+	 * @param to
+	 *            Tree Path zum Anzeigen in BaumStruktur
+	 */
+	public void scrollBaumStrukt(TreePath to) {
+
+		baum_strukt.scrollPathToVisible(to);
+	}
+
+	/**
+	 * Ermittelt das aktuelle getLastSelectedPathComponent von baum_strukt wird
+	 * in anonymen inneren Klassen verwendet
+	 * 
+	 * @return Object fuer baum_strukt.getLastSelectedPathComponent()
+	 */
+	public Object getBaumStruktPath() {
+		return baum_strukt.getLastSelectedPathComponent();
+	}
+
+	/**
+	 * Ermittelt das aktuelle Model von baum_strukt; wird in anonymen inneren
+	 * Klassen verwendet
+	 * 
+	 * @return TreeModel von baum_strukt
+	 */
+	public TreeModel getBaumStrukturModel() {
+		return baum_strukt.getModel();
+	}
+
+	/**
+	 * Zeichne die Baumstruktur neu bei anonymen inneren Klassen
+	 */
+	public void repaint_baum_strukt() {
+		baum_strukt.updateUI();
+		baum_strukt.repaint();
+	}
+
+	/**
+	 * Zeichne StatusBar neu bei anonymen inneren Klassen
+	 */
+	public void repaint_StatusBar() {
+		StatusBar.updateUI();
+		StatusBar.repaint();
 	}
 
 	/**
@@ -151,7 +218,7 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void run() {
-				changeOrdner(baum_strukt.getSelectionPath().toString());
+				changeOrdner(getSelectedPath().toString());
 				refreshMailListe();
 
 				if (!isSesRunning && Configuration.getAnzahlminuten() > 0) {
@@ -160,12 +227,48 @@ public class MailClient_Hauptfenster extends JFrame {
 							TimeUnit.MINUTES);
 				}
 
-				baum_strukt.repaint();
-				baum_strukt.updateUI();
-
+				repaint_baum_strukt();
+				repaint_StatusBar();
 			}
 
 		});
+	}
+
+	/**
+	 * Ermittelt orignalen Array-Index zu Row
+	 * 
+	 * @param row
+	 *            Zeile, deren original-index gewuenscht wird
+	 * @return Index innerhalb ArrayList von gewueschter Sichtbaren Zeile (row)
+	 */
+	public int MailListRowToIndex(int row) {
+		int result = -1;
+		if (row > -1)
+			result = table_mailListe.convertRowIndexToModel(row);
+		return result;
+	}
+
+	/**
+	 * Ist mind. 1 E-Mail gewaehlt?
+	 * 
+	 * @return true || false
+	 */
+	public boolean MailListHatAuswahl() {
+		boolean result = false;
+
+		if (table_mailListe.getSelectedRow() > -1)
+			result = true;
+
+		return result;
+	}
+
+	/**
+	 * Alle ausgewaehlten Zeilen
+	 * 
+	 * @return Array (int) der gewaehlten Zeilen
+	 */
+	public int[] gewaehlteMails() {
+		return table_mailListe.getSelectedRows();
 	}
 
 	/**
@@ -181,9 +284,18 @@ public class MailClient_Hauptfenster extends JFrame {
 		int result = -1;
 
 		if (idx_view > -1)
-			result = table_mailListe.convertRowIndexToModel(idx_view);
+			result = MailListRowToIndex(idx_view);
 
 		return result;
+	}
+
+	/**
+	 * Ermittle den aktuellen Ordner fuer anonyme innere Klassen.
+	 * 
+	 * @return ordnerHandler.getAktFolder()
+	 */
+	public Preferences getGewaehlterOrdner() {
+		return ordnerHandler.getAktFolder();
 	}
 
 	/**
@@ -204,12 +316,12 @@ public class MailClient_Hauptfenster extends JFrame {
 	 */
 	public void empfangeMails() {
 
-		new SwingWorker<Object, Object>() {
+		new SwingWorker<Boolean, Object>() {
 			ReceiveMail RevieceMailer = new ReceiveMail();
 
 			@Override
-			protected Object doInBackground() throws Exception {
-				return RevieceMailer.getMails();
+			protected Boolean doInBackground() throws Exception {
+				return Boolean.valueOf(RevieceMailer.getMails());
 			}
 
 			@Override
@@ -227,8 +339,12 @@ public class MailClient_Hauptfenster extends JFrame {
 
 	}
 
+	public void setPublicStatusBarText(String txt) {
+		StatusBar.setText(txt);
+	}
+
 	/**
-	 * Setze den StatusBar-Text
+	 * Setze den StatusBar-Text in inneren anonymen Klassen
 	 * 
 	 * @param text
 	 *            Wert fuer StatusBar
@@ -239,12 +355,8 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void run() {
-				StatusBar.setText(text);
-				StatusBar.updateUI();
-
-				changeOrdner(baum_strukt.getSelectionPath().toString());
-				refreshMailListe();
-
+				setPublicStatusBarText(text);
+				refreshGUI();
 			}
 
 		});
@@ -255,7 +367,8 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * Zeige Dialog fuer Einstellungen
 	 */
 	public void ShowSettingDialog() {
-		new MailClient_EinstellungenFenster();
+		JDialog jd = new MailClient_EinstellungenFenster();
+		jd.setVisible(true);
 	}
 
 	/**
@@ -266,7 +379,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	private JMenuBar guiGetMenu() {
 
 		JMenuBar menuBar = new JMenuBar();
-		;
+
 		JMenu Datei, Extras;
 		JMenuItem menuItem, Einstellungen, Aktualisieren, Neuesmail;
 
@@ -395,7 +508,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		// Baum ausklappen
 		baum_strukt.expandPath(baum_strukt.getPathForRow(0));
 		// Erstes Element auswaehlen
-		baum_strukt.setSelectionPath(baum_strukt.getPathForRow(1));
+		setBaumStruktSelectionPath(baum_strukt.getPathForRow(1));
 
 		// Was bei Auswahl von Ordner passieren soll
 		baum_strukt.addTreeSelectionListener(new TreeSelectionListener() {
@@ -429,6 +542,17 @@ public class MailClient_Hauptfenster extends JFrame {
 	}
 
 	/**
+	 * Wrapper Methoden für baum_strukt.setSelectionPath bei anonymen inneren
+	 * Klassen
+	 * 
+	 * @param pathForLocation
+	 *            TreePath: Neuer Pfad zum Setzen
+	 */
+	public void setBaumStruktSelectionPath(TreePath pathForLocation) {
+		baum_strukt.setSelectionPath(pathForLocation);
+	}
+
+	/**
 	 * MouseListener fuer Auswahl rechte Maustaste in Ordner-Baum
 	 * 
 	 * @return
@@ -440,9 +564,9 @@ public class MailClient_Hauptfenster extends JFrame {
 			public void mousePressed(MouseEvent arg0) {
 				// mit Rechtsklick auch richtiges Element auswählen
 				if (arg0.getButton() == MouseEvent.BUTTON3) {
-					TreePath pathForLocation = baum_strukt.getPathForLocation(arg0.getPoint().x, arg0.getPoint().y);
+					TreePath pathForLocation = getPathInBaumStrukt(arg0.getPoint().x, arg0.getPoint().y);
 					if (pathForLocation != null)
-						baum_strukt.setSelectionPath(pathForLocation);
+						setBaumStruktSelectionPath(pathForLocation);
 				}
 				super.mousePressed(arg0);
 			}
@@ -482,9 +606,9 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (baum_strukt.getLastSelectedPathComponent() != null) {
+				if (getBaumStruktPath() != null) {
 
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) getBaumStruktPath();
 					if (node != null) {
 
 						String neuerOrdner = "";
@@ -494,7 +618,7 @@ public class MailClient_Hauptfenster extends JFrame {
 						if (neuerOrdner != null && !neuerOrdner.isEmpty()) {
 							DefaultMutableTreeNode n = new DefaultMutableTreeNode(neuerOrdner);
 
-							if (Configuration.createFolder(neuerOrdner, 0, ordnerHandler.getAktFolder()))
+							if (Configuration.createFolder(neuerOrdner, 0, getGewaehlterOrdner()))
 								node.add(n);
 
 							refreshGUI();
@@ -515,9 +639,9 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (baum_strukt.getLastSelectedPathComponent() != null) {
+				if (getBaumStruktPath() != null) {
 
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) getBaumStruktPath();
 					if (node != null) {
 
 						String editOrdner = "";
@@ -525,27 +649,26 @@ public class MailClient_Hauptfenster extends JFrame {
 						editOrdner = JOptionPane.showInputDialog("Neuer Name:");
 
 						if (editOrdner != null && !editOrdner.isEmpty()) {
-							// DefaultMutableTreeNode n = new
-							// DefaultMutableTreeNode(neuerOrdner);
 
-							// ordnerHandler.getAktFolder().
 							try {
 
-								if (ordnerHandler.getAktFolder() != Configuration.getEingang()
-										&& ordnerHandler.getAktFolder() != Configuration.getGesendet()
-										&& ordnerHandler.getAktFolder() != Configuration.getFolders()) {
+								if (getGewaehlterOrdner() != Configuration.getEingang()
+										&& getGewaehlterOrdner() != Configuration.getGesendet()
+										&& getGewaehlterOrdner() != Configuration.getFolders()) {
 
-									Configuration.createFolder(editOrdner, 0, ordnerHandler.getAktFolder().parent());
-									Configuration.copyNode(ordnerHandler.getAktFolder(),
-											ordnerHandler.getAktFolder().parent().node(editOrdner));
+									Configuration.createFolder(editOrdner, 0, getGewaehlterOrdner().parent());
+									Configuration.copyNode(getGewaehlterOrdner(),
+											getGewaehlterOrdner().parent().node(editOrdner));
 									node.setUserObject(editOrdner);
-									((DefaultTreeModel) baum_strukt.getModel()).nodeChanged(node);
+									((DefaultTreeModel) getBaumStrukturModel()).nodeChanged(node);
 
-									ordnerHandler.getAktFolder().removeNode();
+									getGewaehlterOrdner().removeNode();
 
 								}
 
 							} catch (BackingStoreException e) {
+								if (Configuration.isDebug())
+									e.printStackTrace();
 
 							}
 
@@ -567,9 +690,9 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (baum_strukt.getLastSelectedPathComponent() != null) {
+				if (getBaumStruktPath() != null) {
 
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) baum_strukt.getLastSelectedPathComponent();
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) getBaumStruktPath();
 					if (node != null) {
 
 						int reply = JOptionPane.showConfirmDialog(null, "Wirklich loeschen mit allen Mails?",
@@ -578,25 +701,27 @@ public class MailClient_Hauptfenster extends JFrame {
 
 							try {
 
-								if (ordnerHandler.getAktFolder() != Configuration.getEingang()
-										&& ordnerHandler.getAktFolder() != Configuration.getGesendet()
-										&& ordnerHandler.getAktFolder() != Configuration.getFolders()) {
+								if (getGewaehlterOrdner() != Configuration.getEingang()
+										&& getGewaehlterOrdner() != Configuration.getGesendet()
+										&& getGewaehlterOrdner() != Configuration.getFolders()) {
 
-									baum_strukt.setSelectionPath(
+									setBaumStruktSelectionPath(
 											new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
-									baum_strukt.scrollPathToVisible(
+									scrollBaumStrukt(
 											new TreePath((((DefaultMutableTreeNode) node.getParent()).getPath())));
 
 									node.removeAllChildren();
 									node.removeFromParent();
 
-									((DefaultTreeModel) baum_strukt.getModel()).nodeChanged(node.getParent());
+									((DefaultTreeModel) getBaumStrukturModel()).nodeChanged(node.getParent());
 
-									ordnerHandler.getAktFolder().removeNode();
+									getGewaehlterOrdner().removeNode();
 
 								}
 
 							} catch (BackingStoreException e) {
+								if (Configuration.isDebug())
+									e.printStackTrace();
 
 							}
 
@@ -612,13 +737,22 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * MailListe aktualisieren
 	 */
 	public void refreshMailListe() {
-		mailHandler = new MailHandler(ordnerHandler.getAktFolder());
+		mailHandler = new MailHandler(getGewaehlterOrdner());
 
 		// MailGrideModel = new DataMailListTableModel();
-		MailGrideModel.changeOrdner(ordnerHandler.getAktFolder());
+		MailGrideModel.changeOrdner(getGewaehlterOrdner());
 		MailGrideModel.setNewData(mailHandler.getMailList());
 		MailGrideModel.fireTableDataChanged();
 		MailGrideModel.fireTableStructureChanged();
+	}
+
+	/**
+	 * Wrapper: Gibt den MailHandler fuer die anonymen inneren Klassen zurueck
+	 * 
+	 * @return MailHandler
+	 */
+	public MailHandler getMailHandler() {
+		return mailHandler;
 	}
 
 	/**
@@ -641,8 +775,8 @@ public class MailClient_Hauptfenster extends JFrame {
 
 				if (evt.getClickCount() == 2) {
 					int idx = getSelectedMailListRow(evt.getPoint());
-					if (idx > -1 && idx <= mailHandler.getMailList().size())
-						oeffneMailFenster(mailHandler.getMailList().get(idx), 0);
+					if (idx > -1 && idx <= getMailHandler().getMailList().size())
+						oeffneMailFenster(getMailHandler().getMailList().get(idx), 0);
 
 				}
 			}
@@ -656,11 +790,12 @@ public class MailClient_Hauptfenster extends JFrame {
 				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
 
 					// e.get
-					if (table_mailListe.getSelectedRow() > -1) {
+					if (MailListHatAuswahl()) {
 						int counter = 0;
-						for (int idx : table_mailListe.getSelectedRows()) {
-							mailHandler.removeMail(mailHandler.getMailList()
-									.get(table_mailListe.convertRowIndexToModel(idx)).getHerkunft());
+						for (int idx : gewaehlteMails()) {
+							int row = MailListRowToIndex(idx);
+							if (row > -1)
+								getMailHandler().removeMail(getMailHandler().getMailList().get(row).getHerkunft());
 							counter++;
 						}
 						setStatusBarText(counter + " Mails geloescht");
@@ -683,8 +818,6 @@ public class MailClient_Hauptfenster extends JFrame {
 			}
 
 		});
-
-		TableColumnModel tcm = table_mailListe.getColumnModel();
 
 		JScrollPane scroll = new JScrollPane(table_mailListe);
 
@@ -756,7 +889,8 @@ public class MailClient_Hauptfenster extends JFrame {
 	 *            nicht verwendet
 	 */
 	public static void main(String args[]) {
-		new MailClient_Hauptfenster();
+		JFrame main = new MailClient_Hauptfenster();
+		main.setVisible(true);
 
 	}
 

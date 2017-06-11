@@ -109,7 +109,10 @@ public class SendMail {
 
 			// System.out.println("Message sent");
 		} catch (MessagingException e) {
-			// e.printStackTrace();
+
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 			FehlerText = "<html>Hoppla, da ist etwas schief gelaufen.<br> Stimmen die SMTP-Angaben?</html>";
 			Erfolg = false;
 		}
