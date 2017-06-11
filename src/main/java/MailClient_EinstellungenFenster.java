@@ -164,7 +164,7 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				JLabel div_autoLaden= new JLabel("Mails alle x Minuten automatisch laden: ");
 	
 
-				final JTextField div_autoLaden_Field = new JTextField(Configuration.getAnzahlminuten().toString(), 20);
+				final JTextField div_autoLaden_Field = new JTextField(Long.toString(Configuration.getAnzahlminuten()), 20);
 
 
 				div_autoLaden.setDisplayedMnemonic(KeyEvent.VK_S);
