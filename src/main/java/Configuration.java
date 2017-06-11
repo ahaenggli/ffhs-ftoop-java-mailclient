@@ -33,7 +33,7 @@ public final class Configuration {
 	private static final String NamePostausgang = "Gesendet";
 
 	// Debug Params fuer Sys-Outputs
-	private static boolean Debug = true;
+	private static boolean Debug = false;
 
 	// pop3-Einstellungen (Mail senden)
 	private final static String POP3Server = "POP3Server";
@@ -186,16 +186,8 @@ public final class Configuration {
 	 */
 	public final static Preferences getFolders() {
 
-		// Sicherstellen, dass Ein- und Ausgang existieren
-			
-			try {
-				getEingang();
-				getGesendet();
-			} catch (BackingStoreException e) {
-				if(Configuration.getDebug())
-				e.printStackTrace();
-			}
-		
+		getEingang();
+		getGesendet();		
 
 		return folders;
 	}
@@ -430,12 +422,17 @@ public final class Configuration {
 	 * Gibt sStandard-Verzeichnis fuer gesendete Mails
 	 * 
 	 * @return Preferences
-	 * @throws BackingStoreException
-	 */
-	public static Preferences getGesendet() throws BackingStoreException {
 
-		if (!folders.nodeExists(NamePostausgang))
-			createFolder(NamePostausgang, 2, folders);
+	 */
+	public static Preferences getGesendet() {
+
+		try {
+			if (!folders.nodeExists(NamePostausgang))
+				createFolder(NamePostausgang, 2, folders);
+		} catch (BackingStoreException e) {
+			if(Configuration.getDebug())
+			e.printStackTrace();
+		}
 		return folders.node(NamePostausgang);
 	}
 

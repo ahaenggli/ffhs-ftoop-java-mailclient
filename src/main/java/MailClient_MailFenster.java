@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
 /**
@@ -38,15 +38,21 @@ public class MailClient_MailFenster extends JDialog {
 	private JButton Antworten = new JButton("Antworten");
 	private JButton Weiterleiten = new JButton("Weiterleiten");
 
+	private JLabel err = new JLabel("");
+	
 	private boolean isAW = false;
 	private boolean isWG = false;
 
 	private JPanel alles;
 
 	/**
-	 * 0 = nichts (gesperrt) 1 = senden (leer) 2 = Antworten 3 = Weiterleiten 4
-	 * = Löschen
+	 * 0 = nichts (gesperrt) 
+	 * 1 = senden (leer) 
+	 * 2 = Antworten 
+	 * 3 = Weiterleiten 
+	 * 4 = Löschen
 	 */
+	
 	private int Aktion = 0;
 
 	/**
@@ -77,25 +83,42 @@ public class MailClient_MailFenster extends JDialog {
 
 		if (!e.isEmpty() && !b.isEmpty() && !n.isEmpty()) {
 
+			
+			
+			
 			MailStruktur mail = new MailStruktur(new Date(), Configuration.getsmtpUser(), b, n, null, null);
 			mail.setEmpfaenger(e);
 			mail.setBCC(Blindkopie.getText().trim());
 			mail.setCC(Kopie.getText().trim());
 
-			SendMail mailSender = new SendMail();
-			mailSender.send(mail);
+			
+			
+			new SwingWorker<Object, Object>() {
+				SendMail mailSender = new SendMail();
 
-			if (mailSender.getErfolg()) {
-				System.out.println("hier");
-				MailHandler.addMailToFolder(mail, Configuration.getGesendet());
-				dispose();
-			} else {
-				JLabel err = new JLabel(mailSender.getFehlerText());
-				// err.setFont(new Font("red"));
-				err.setForeground(Color.red);
-				alles.add(err);
-				alles.updateUI();
+				@Override
+				protected Object doInBackground() throws Exception {
+					err.setText("Versuche das Mail zu senden...");
+					err.setForeground(Color.black);
+					
+					changeAction(0);
+					return mailSender.send(mail);
+				}
+
+				@Override
+				protected void done() {
+					if (mailSender.getErfolg()) {
+						System.out.println("hier");
+						MailHandler.addMailToFolder(mail, Configuration.getGesendet());
+						dispose();
+					} else {						
+						err.setText(mailSender.getFehlerText());
+						err.setForeground(Color.red);
+						changeAction(1);
+					}
+
 			}
+				}.execute();																		
 		}
 	}
 
@@ -168,7 +191,8 @@ public class MailClient_MailFenster extends JDialog {
 
 		alles.add(macheLabelZuKomponente("Nachricht:", spEditor));// new
 																	// JScrollPane(Nachricht)));
-
+		alles.add(err);
+		
 		add(alles);
 		doAction();
 		// so viele Fenster wie man möchte erlauben und Parent nicht sperren
@@ -186,9 +210,6 @@ public class MailClient_MailFenster extends JDialog {
 		// ((JLabel) getComponentByName("lbl_Empfaenger")).setText("Empfänger");
 		if (Aktion == 0) {
 			setter = false;
-
-			// ((JLabel)
-			// getComponentByName("lbl_Empfaenger")).setText("Absender");
 		} else if (Aktion == 1) {
 			setter = true;
 

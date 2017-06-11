@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -105,9 +106,41 @@ public class MailClient_Hauptfenster extends JFrame {
 	 *            runnable
 	 */
 	public void addRunnable(Runnable run) {
-		EventQueue.invokeLater(run);
+		//EventQueue.invokeLater(run);
+		 SwingUtilities.invokeLater(run);
 	}
 
+	/**
+	 * Oeffne neues MailFenster in neuem Thread
+	 * @param msX
+	 * MailDaten falls bestehendes Mail geoeffnet wird
+	 * @param ParamX
+	 * Ansichtsparam fuer Beschriftung von labels (Absender/Empfaenger)
+	 * @return 
+	 */
+	public void oeffneMailFenster(MailStruktur msX, int ParamX){
+		MailStruktur ms = null;
+		int Param = 1;
+		
+		if(msX != null) ms = msX;
+		else ms = new MailStruktur(); //Leeres Mail...
+		if(ParamX > 0) Param = ParamX;
+		
+		final MailStruktur fms = ms;
+		final int fParam = Param;
+		
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {				
+				new MailClient_MailFenster(fms, fParam);
+			}
+		
+		};
+		
+		 SwingUtilities.invokeLater(r);
+		
+		
+	}
 	/**
 	 * Aktualisiere GUI und Ordner Pruefe ob background-Thread fuer Mail empfang
 	 * aktiviert werden muss
@@ -313,8 +346,10 @@ public class MailClient_Hauptfenster extends JFrame {
 
 		Neuesmail.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				new MailClient_MailFenster(new MailStruktur(), 1);
+			public void actionPerformed(ActionEvent e) {			
+				
+				 oeffneMailFenster(null, 1);
+				 
 			}
 
 		});
@@ -579,7 +614,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	/**
 	 * MailListe aktualisieren
 	 */
-	private void refreshMailListe() {
+	public void refreshMailListe() {
 		mailHandler = new MailHandler(ordnerHandler.getAktFolder());
 		MailGrideModel.setNewData(mailHandler.getMailList());
 		MailGrideModel.fireTableDataChanged();
@@ -604,15 +639,8 @@ public class MailClient_Hauptfenster extends JFrame {
 
 				if (evt.getClickCount() == 2) {
 					
+					oeffneMailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint())), 0);					
 					
-					new MailClient_MailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint())), 0);
-					
-					/*
-					new MailClient_MailFenster(mailHandler.getMailList()[], (String) ,
-							(String) getSelectedMailListRow(evt.getPoint(), 3),
-							(String) getSelectedMailListRow(evt.getPoint(), 1),
-							(Preferences) getSelectedMailListRow(evt.getPoint(), 5), 0);
-*/
 				}
 			}
 		});
