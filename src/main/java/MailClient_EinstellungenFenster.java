@@ -92,7 +92,7 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				Configuration.setPop3PW(new String(pop3_passwordField.getPassword()));
 				Configuration.setPop3Port(pop3_portField.getText());
 				
-				if(Configuration.getDebug()) System.out.println("POP3-Einstellungen gespeichert");
+				if(Configuration.isDebug()) System.out.println("POP3-Einstellungen gespeichert");
 				
 			}
 		});
@@ -145,7 +145,7 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				Configuration.setsmtpPort(smtp_portField.getText());
 				
 				
-				if(Configuration.getDebug()) System.out.println("SMTP-Einstellungen gespeichert");
+				if(Configuration.isDebug()) System.out.println("SMTP-Einstellungen gespeichert");
 				
 				
 			}
@@ -181,7 +181,7 @@ public class MailClient_EinstellungenFenster extends JDialog {
 						Configuration.setAnzahlminuten(div_autoLaden_Field.getText());
 	
 						
-						if(Configuration.getDebug()) System.out.println("div_save-Einstellungen gespeichert");
+						if(Configuration.isDebug()) System.out.println("div_save-Einstellungen gespeichert");
 						
 					}
 				});

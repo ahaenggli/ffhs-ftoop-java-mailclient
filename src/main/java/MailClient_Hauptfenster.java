@@ -82,12 +82,12 @@ public class MailClient_Hauptfenster extends JFrame {
 			try {
 
 				if (Configuration.getAnzahlminuten() <= 0) {
-					if (Configuration.getDebug())
+					if (Configuration.isDebug())
 						System.out.println("Thread should die");
 					ses.shutdownNow();
 					isSesRunning = false;
 				} else {
-					if (Configuration.getDebug())
+					if (Configuration.isDebug())
 						System.out.println("Ich bin gelaufen");
 					isSesRunning = true;
 					empfangeMails();
@@ -386,6 +386,7 @@ public class MailClient_Hauptfenster extends JFrame {
 		OrdnerListe = new DefaultMutableTreeNode(Configuration.getNameRootFolder());
 		ordnerHandler = new OrdnerHandler();
 
+		if(Configuration.isDebug())			
 		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
 
 		// Aktuelle Ordner auslesen und anh�ngen
@@ -393,6 +394,7 @@ public class MailClient_Hauptfenster extends JFrame {
 
 		baum_strukt = new JTree(new DefaultTreeModel(OrdnerListe));
 
+		if(Configuration.isDebug())
 		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
 
 		// Baum ausklappen
@@ -407,7 +409,7 @@ public class MailClient_Hauptfenster extends JFrame {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getNewLeadSelectionPath()
 						.getLastPathComponent();
 
-				if (Configuration.getDebug())
+				if (Configuration.isDebug())
 					System.out.println(node);
 
 				addRunnable(new Runnable() {
@@ -730,10 +732,12 @@ public class MailClient_Hauptfenster extends JFrame {
 	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<OrdnerStruktur> Elements) {
 		if (Elements.size() > 0) {
 
+			if(Configuration.isDebug())
 			System.out.println("Anzahl Elemente: " + Elements.size());
 
 			for (OrdnerStruktur Element : Elements) {
 
+				if(Configuration.isDebug())
 				System.out.println("Element: " + Element.getName());
 
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(Element.getName());

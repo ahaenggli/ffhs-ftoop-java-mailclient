@@ -54,7 +54,7 @@ public class OrdnerHandler {
 			SucheIn = Configuration.getFolders();
 		} else SucheIn = parentX;
 		
-		if(Configuration.getDebug())
+		if(Configuration.isDebug())
 		System.out.println("--> Absoluter Pfad: " + SucheIn.absolutePath());
 		
 		ArrayList<OrdnerStruktur> tmpList = new ArrayList<OrdnerStruktur>();
@@ -66,7 +66,7 @@ public class OrdnerHandler {
 
 				p = "[" + p.replace("/", ", ") + "]";
 
-				if(Configuration.getDebug()){
+				if(Configuration.isDebug()){
 				System.out.println("--> Vergleichspfad: " + p);
 				System.out.println("--> Suchenderpfad : " + gewaehlterMailOrdner);
 				}
@@ -76,8 +76,13 @@ public class OrdnerHandler {
 
 					// ist unser gesuchter Ordner, daher aktFolder setzen
 					if (gewaehlterMailOrdner.equals(p)) {
-						System.out.println("---> Ordner gefunden");
+						
+						
 						aktFolder = child;
+						
+						if(Configuration.isDebug())
+							System.out.println("---> Ordner gefunden" + aktFolder);
+							
 					}
 
 					// auf jeden Fall gefundenen Ordner der Liste anfügen
@@ -88,11 +93,10 @@ public class OrdnerHandler {
 					// ist Mail, daher keine weiteren Schritte hier
 				}
 
-				System.out.println("");
 
 			}
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 				e.printStackTrace();
 		}
 
@@ -135,7 +139,10 @@ public class OrdnerHandler {
 		if (gewaehlterMailOrdner == null)
 			this.gewaehlterMailOrdner  = "[" + Configuration.getNameRootFolder() + ", " + Configuration.getNamePosteingang() + "]";
 		else this.gewaehlterMailOrdner = gewaehlterMailOrdner;
+		
+		if(Configuration.isDebug())
 		System.out.println("-> Öffne Ordner: " + this.gewaehlterMailOrdner);
+		
 		FolderList = makeFolderList(null);
 	}
 

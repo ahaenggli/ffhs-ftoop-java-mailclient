@@ -76,7 +76,7 @@ public final class Configuration {
 			returnWert = true;
 		} catch (BackingStoreException e) {
 			returnWert = false;
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 				e.printStackTrace();
 			
 		}
@@ -95,7 +95,7 @@ public final class Configuration {
 		try {
 			prefs.sync();
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 				e.printStackTrace();
 			
 		}
@@ -121,7 +121,7 @@ public final class Configuration {
 			prefs.sync();
 			result = true;
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 			e.printStackTrace();
 			
 			result = false;
@@ -145,7 +145,7 @@ public final class Configuration {
 			prefs.flush();
 			prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 			e.printStackTrace();
 		}
 
@@ -166,7 +166,7 @@ public final class Configuration {
 	 * 
 	 * @return true|false
 	 */
-	public final static boolean getDebug() {
+	public final static boolean isDebug() {
 		return Debug;
 	}
 
@@ -411,7 +411,7 @@ public final class Configuration {
 			if (!folders.nodeExists(NamePosteingang))
 				createFolder(NamePosteingang, 1, folders);
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 			e.printStackTrace();
 		}
 
@@ -430,7 +430,7 @@ public final class Configuration {
 			if (!folders.nodeExists(NamePostausgang))
 				createFolder(NamePostausgang, 2, folders);
 		} catch (BackingStoreException e) {
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 			e.printStackTrace();
 		}
 		return folders.node(NamePostausgang);
@@ -449,7 +449,7 @@ public final class Configuration {
 		} catch (NumberFormatException e) {
 			min = 0;
 			
-			if(Configuration.getDebug())
+			if(Configuration.isDebug())
 			e.printStackTrace();
 			
 		}
