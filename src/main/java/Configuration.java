@@ -76,9 +76,9 @@ public final class Configuration {
 			returnWert = true;
 		} catch (BackingStoreException e) {
 			returnWert = false;
-			if(Configuration.isDebug())
+			if (Configuration.isDebug())
 				e.printStackTrace();
-			
+
 		}
 		return returnWert;
 	}
@@ -95,9 +95,9 @@ public final class Configuration {
 		try {
 			prefs.sync();
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
+			if (Configuration.isDebug())
 				e.printStackTrace();
-			
+
 		}
 
 		return prefs.get(Name, "");
@@ -121,9 +121,9 @@ public final class Configuration {
 			prefs.sync();
 			result = true;
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
-			e.printStackTrace();
-			
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 			result = false;
 		}
 		return result;
@@ -145,8 +145,8 @@ public final class Configuration {
 			prefs.flush();
 			prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
-			e.printStackTrace();
+			if (Configuration.isDebug())
+				e.printStackTrace();
 		}
 
 	}
@@ -187,7 +187,7 @@ public final class Configuration {
 	public final static Preferences getFolders() {
 
 		getEingang();
-		getGesendet();		
+		getGesendet();
 
 		return folders;
 	}
@@ -247,8 +247,8 @@ public final class Configuration {
 
 	/**
 	 * Gibt POP3User zurueck
-	 * @return
-	 * Text
+	 * 
+	 * @return Text
 	 */
 	public final static String getPop3User() {
 		return getValue(POP3User);
@@ -265,8 +265,8 @@ public final class Configuration {
 
 	/**
 	 * Gibt POP3PW zurück
-	 * @return
-	 * text
+	 * 
+	 * @return text
 	 */
 	public final static String getPop3PW() {
 		return getValue(POP3PW);
@@ -283,8 +283,8 @@ public final class Configuration {
 
 	/**
 	 * Gibt POP3Port zurück
-	 * @return
-	 * Text
+	 * 
+	 * @return Text
 	 */
 	public final static String getPop3Port() {
 		return getValue(POP3Port);
@@ -304,8 +304,8 @@ public final class Configuration {
 	 */
 	/**
 	 * Gibt smtpServer zurück
-	 * @return
-	 * Text
+	 * 
+	 * @return Text
 	 */
 	public final static String getsmtpServer() {
 		return getValue(smtpServer);
@@ -322,8 +322,8 @@ public final class Configuration {
 
 	/**
 	 * Gibt smtpUser zurück
-	 * @return
-	 * Text
+	 * 
+	 * @return Text
 	 */
 	public final static String getsmtpUser() {
 		return getValue(smtpUser);
@@ -341,8 +341,7 @@ public final class Configuration {
 	/**
 	 * Gibt smtpPW zurück
 	 * 
-	 * @return
-	 * Text
+	 * @return Text
 	 */
 	public final static String getsmtpPW() {
 		return getValue(smtpPW);
@@ -360,8 +359,8 @@ public final class Configuration {
 
 	/**
 	 * Gibt smtpPort zurück
-	 * @return
-	 * Text
+	 * 
+	 * @return Text
 	 */
 	public final static String getsmtpPort() {
 		return getValue(smtpPort);
@@ -385,17 +384,17 @@ public final class Configuration {
 	 *            Wo soll Ordner gesucht/erstellt werden
 	 * @return Gefundener Ordner
 	 * @throws BackingStoreException
+	 *             Einstellungen nicht gefunden oder Zugriff blockiert
 	 */
 	public static Preferences getOrdner(String x, Preferences parent) throws BackingStoreException {
 
 		if (parent == null)
 			return folders;
-		else
-		{
-		if (!parent.nodeExists(x))
-			createFolder(x, 1, parent);
+		else {
+			if (!parent.nodeExists(x))
+				createFolder(x, 1, parent);
 
-		return parent.node(x);
+			return parent.node(x);
 		}
 	}
 
@@ -403,7 +402,6 @@ public final class Configuration {
 	 * Gibt Standard-Verzeichnis fuer Neue Mails
 	 * 
 	 * @return Preferences
-	 * @throws BackingStoreException
 	 */
 	public static Preferences getEingang() {
 
@@ -411,8 +409,8 @@ public final class Configuration {
 			if (!folders.nodeExists(NamePosteingang))
 				createFolder(NamePosteingang, 1, folders);
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
-			e.printStackTrace();
+			if (Configuration.isDebug())
+				e.printStackTrace();
 		}
 
 		return folders.node(NamePosteingang);
@@ -422,7 +420,7 @@ public final class Configuration {
 	 * Gibt sStandard-Verzeichnis fuer gesendete Mails
 	 * 
 	 * @return Preferences
-
+	 * 
 	 */
 	public static Preferences getGesendet() {
 
@@ -430,8 +428,8 @@ public final class Configuration {
 			if (!folders.nodeExists(NamePostausgang))
 				createFolder(NamePostausgang, 2, folders);
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
-			e.printStackTrace();
+			if (Configuration.isDebug())
+				e.printStackTrace();
 		}
 		return folders.node(NamePostausgang);
 	}
@@ -448,10 +446,10 @@ public final class Configuration {
 			min = Long.parseLong(getValue(anzahlMinuten));
 		} catch (NumberFormatException e) {
 			min = 0;
-			
-			if(Configuration.isDebug())
-			e.printStackTrace();
-			
+
+			if (Configuration.isDebug())
+				e.printStackTrace();
+
 		}
 		return min;
 	}
@@ -475,7 +473,7 @@ public final class Configuration {
 	 * @param newNode
 	 *            Zu war soll kopiert werden
 	 * @throws BackingStoreException
-	 *             Fehler
+	 *             Einstellungen nicht gefunden oder Zugriff blockiert
 	 */
 	public final static void copyNode(Preferences src, Preferences newNode) throws BackingStoreException {
 		if (src.childrenNames().length > 0) {

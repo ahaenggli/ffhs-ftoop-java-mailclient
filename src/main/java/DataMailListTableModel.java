@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-
 import javax.swing.table.AbstractTableModel;
 
 /**
- * Model welches für das Nachrichten-Fenster gebraucht wird.
- * Reihenfolge hier definiert auch Reihenfolge und Sichtbarkeit von Feldern in Mail-Übersicht
+ * Model welches für das Nachrichten-Fenster gebraucht wird. Reihenfolge hier
+ * definiert auch Reihenfolge und Sichtbarkeit von Feldern in Mail-Übersicht
+ * 
  * @author ahaen
  *
  */
@@ -16,8 +16,9 @@ class DataMailListTableModel extends AbstractTableModel {
 	 */
 	private static final long serialVersionUID = -6659022226302820746L;
 
-	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID"};
-	//public Class[] m_colTypes = { String.class, String.class, String.class, String.class, String.class};
+	public String[] m_colNames = { "Datum", "Absender", "Betreff", "Nachricht", "ID" };
+	// public Class[] m_colTypes = { String.class, String.class, String.class,
+	// String.class, String.class};
 
 	private ArrayList<MailStruktur> m_macDataVector;
 
@@ -43,18 +44,17 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public void setValueAt(Object value, int row, int col) {
-		//MailStruktur macData = (m_macDataVector.get(row));
+		// MailStruktur macData = (m_macDataVector.get(row));
 
 	}
 
 	public String getColumnName(int col) {
 		return m_colNames[col];
 	}
-/*
-	public Class getColumnClass(int col) {
-		return m_colTypes[col];
-	}
-*/
+
+	/*
+	 * public Class getColumnClass(int col) { return m_colTypes[col]; }
+	 */
 	public Object getValueAt(int row, int col) {
 		MailStruktur macData = (m_macDataVector.get(row));
 

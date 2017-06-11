@@ -103,44 +103,46 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * Methoden
 	 * 
 	 * @param run
-	 *            runnable
+	 *            runnable zum Ausfuehren in Hintergrund
 	 */
 	public void addRunnable(Runnable run) {
-		//EventQueue.invokeLater(run);
-		 SwingUtilities.invokeLater(run);
+		// EventQueue.invokeLater(run);
+		SwingUtilities.invokeLater(run);
 	}
 
 	/**
 	 * Oeffne neues MailFenster in neuem Thread
+	 * 
 	 * @param msX
-	 * MailDaten falls bestehendes Mail geoeffnet wird
+	 *            MailDaten falls bestehendes Mail geoeffnet wird
 	 * @param ParamX
-	 * Ansichtsparam fuer Beschriftung von labels (Absender/Empfaenger)
-	 * @return 
+	 *            Ansichtsparam fuer Beschriftung von labels
+	 *            (Absender/Empfaenger)
 	 */
-	public void oeffneMailFenster(MailStruktur msX, int ParamX){
+	public void oeffneMailFenster(MailStruktur msX, int ParamX) {
 		MailStruktur ms = null;
-		int Param = 1;
-		
-		if(msX != null) ms = msX;
-		else ms = new MailStruktur(); //Leeres Mail...
-		if(ParamX > 0) Param = ParamX;
-		
+
+		if (msX != null)
+			ms = msX;
+		else
+			ms = new MailStruktur(); // Leeres Mail...
+	
+
 		final MailStruktur fms = ms;
-		final int fParam = Param;
-		
-		Runnable r = new Runnable(){
+		final int fParam = ParamX;
+
+		Runnable r = new Runnable() {
 			@Override
-			public void run() {				
+			public void run() {
 				new MailClient_MailFenster(fms, fParam);
 			}
-		
+
 		};
-		
-		 SwingUtilities.invokeLater(r);
-		
-		
+
+		SwingUtilities.invokeLater(r);
+
 	}
+
 	/**
 	 * Aktualisiere GUI und Ordner Pruefe ob background-Thread fuer Mail empfang
 	 * aktiviert werden muss
@@ -171,24 +173,11 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * Ermittle ausgewaehlte Mail fuer Antworten/Weiterleiten
 	 * 
 	 * @param evt
-	 *            Event
-	 * @param colS
-	 *            Gewaehlte Zeile
-	 * @return Herkunft von Mail
+	 *            Event mit Point von Aufruf drin
+	 * @return Index (row) von gewähltem Mail in original Array
 	 */
 	public int getSelectedMailListRow(Point evt) {
-		//int texti = "";
-
 		int row = table_mailListe.rowAtPoint(evt);
-		//int col = table_mailListe.columnAtPoint(evt);
-		/*if (row >= 0 && col >= 0) {
-
-			texti = table_mailListe.getModel().getValueAt(table_mailListe.convertRowIndexToModel(row), colS).toString();
-			if (colS == 5)
-				texti = mailHandler.getMailList().get(row).getHerkunft();
-
-		}*/
-
 		return row;// texti;
 	}
 
@@ -200,7 +189,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	 */
 	public void changeOrdner(String neu) {
 		ordnerHandler.setGewaehlterMailOrdner(neu);
-		//refreshGUI();
+		// refreshGUI();
 		refreshMailListe();
 
 	}
@@ -286,13 +275,14 @@ public class MailClient_Hauptfenster extends JFrame {
 		menuItem.setMnemonic(KeyEvent.VK_B);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
 
-		menuItem.addActionListener(new ActionListener(){
+		menuItem.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
-				
-			}});
+
+			}
+		});
 		Datei.add(menuItem);
 
 		Extras = new JMenu("Extras");
@@ -346,10 +336,10 @@ public class MailClient_Hauptfenster extends JFrame {
 
 		Neuesmail.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {			
-				
-				 oeffneMailFenster(null, 1);
-				 
+			public void actionPerformed(ActionEvent e) {
+
+				oeffneMailFenster(null, 1);
+
 			}
 
 		});
@@ -386,16 +376,16 @@ public class MailClient_Hauptfenster extends JFrame {
 		OrdnerListe = new DefaultMutableTreeNode(Configuration.getNameRootFolder());
 		ordnerHandler = new OrdnerHandler();
 
-		if(Configuration.isDebug())			
-		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
+		if (Configuration.isDebug())
+			System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
 
 		// Aktuelle Ordner auslesen und anhï¿½ngen
 		addTreeChildren(OrdnerListe, ordnerHandler.getFolderList());
 
 		baum_strukt = new JTree(new DefaultTreeModel(OrdnerListe));
 
-		if(Configuration.isDebug())
-		System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
+		if (Configuration.isDebug())
+			System.out.println("Ordnerliste.ChildCount: " + OrdnerListe.getChildCount());
 
 		// Baum ausklappen
 		baum_strukt.expandPath(baum_strukt.getPathForRow(0));
@@ -640,9 +630,9 @@ public class MailClient_Hauptfenster extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 
 				if (evt.getClickCount() == 2) {
-					
-					oeffneMailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint())), 0);					
-					
+
+					oeffneMailFenster(mailHandler.getMailList().get(getSelectedMailListRow(evt.getPoint())), 0);
+
 				}
 			}
 		});
@@ -671,14 +661,14 @@ public class MailClient_Hauptfenster extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-			// nicht verwendet
-				
+				// nicht verwendet
+
 			}
 
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				//nicht verwendet
-				
+				// nicht verwendet
+
 			}
 
 		});
@@ -732,13 +722,13 @@ public class MailClient_Hauptfenster extends JFrame {
 	public void addTreeChildren(DefaultMutableTreeNode parent, ArrayList<OrdnerStruktur> Elements) {
 		if (Elements.size() > 0) {
 
-			if(Configuration.isDebug())
-			System.out.println("Anzahl Elemente: " + Elements.size());
+			if (Configuration.isDebug())
+				System.out.println("Anzahl Elemente: " + Elements.size());
 
 			for (OrdnerStruktur Element : Elements) {
 
-				if(Configuration.isDebug())
-				System.out.println("Element: " + Element.getName());
+				if (Configuration.isDebug())
+					System.out.println("Element: " + Element.getName());
 
 				DefaultMutableTreeNode child = new DefaultMutableTreeNode(Element.getName());
 

@@ -16,13 +16,12 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
- * Fenster um die ganzen  Einstellungen zu ändern
+ * Fenster um die ganzen Einstellungen zu ändern
+ * 
  * @author ahaen
  *
  */
 public class MailClient_EinstellungenFenster extends JDialog {
-
-	
 
 	private static final long serialVersionUID = -8439476419298094881L;
 
@@ -31,12 +30,12 @@ public class MailClient_EinstellungenFenster extends JDialog {
 	 */
 	public MailClient_EinstellungenFenster() {
 		super();
-		//super("adriano's MailClient - Einstellungen");
+		// super("adriano's MailClient - Einstellungen");
 		// Set the default behaviour for the close button
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		// Erzeugung eines neuen Dialoges
-		//JDialog meinJDialog = new JDialog();
+		// JDialog meinJDialog = new JDialog();
 		setTitle("Einstellungen");
 		setSize(450, 300);
 		// Bei Klick auf X schliessen
@@ -91,9 +90,10 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				Configuration.setPop3User(pop3_usernameField.getText());
 				Configuration.setPop3PW(new String(pop3_passwordField.getPassword()));
 				Configuration.setPop3Port(pop3_portField.getText());
-				
-				if(Configuration.isDebug()) System.out.println("POP3-Einstellungen gespeichert");
-				
+
+				if (Configuration.isDebug())
+					System.out.println("POP3-Einstellungen gespeichert");
+
 			}
 		});
 
@@ -143,11 +143,10 @@ public class MailClient_EinstellungenFenster extends JDialog {
 				Configuration.setsmtpUser(smtp_usernameField.getText());
 				Configuration.setsmtpPW(new String(smtp_passwordField.getPassword()));
 				Configuration.setsmtpPort(smtp_portField.getText());
-				
-				
-				if(Configuration.isDebug()) System.out.println("SMTP-Einstellungen gespeichert");
-				
-				
+
+				if (Configuration.isDebug())
+					System.out.println("SMTP-Einstellungen gespeichert");
+
 			}
 		});
 
@@ -156,51 +155,41 @@ public class MailClient_EinstellungenFenster extends JDialog {
 		// Hier werden die JPanels als Registerkarten hinzugefügt
 		tabpane.addTab("SMTP", panelBlue);
 
-		
-		
 		// Diverses
-		
-				// Raster erstellen
-				JLabel div_autoLaden= new JLabel("Mails alle x Minuten automatisch laden: ");
-	
 
-				final JTextField div_autoLaden_Field = new JTextField(Long.toString(Configuration.getAnzahlminuten()), 20);
+		// Raster erstellen
+		JLabel div_autoLaden = new JLabel("Mails alle x Minuten automatisch laden: ");
 
+		final JTextField div_autoLaden_Field = new JTextField(Long.toString(Configuration.getAnzahlminuten()), 20);
 
-				div_autoLaden.setDisplayedMnemonic(KeyEvent.VK_S);
-				div_autoLaden.setLabelFor(pop3_serverField);
-	
-				panelGreen.add(div_autoLaden);
-				panelGreen.add(div_autoLaden_Field);
+		div_autoLaden.setDisplayedMnemonic(KeyEvent.VK_S);
+		div_autoLaden.setLabelFor(pop3_serverField);
 
-	
+		panelGreen.add(div_autoLaden);
+		panelGreen.add(div_autoLaden_Field);
 
-				JButton div_save = new JButton("Speichern");
-				div_save.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent ev) {
-						Configuration.setAnzahlminuten(div_autoLaden_Field.getText());
-	
-						
-						if(Configuration.isDebug()) System.out.println("div_save-Einstellungen gespeichert");
-						
-					}
-				});
+		JButton div_save = new JButton("Speichern");
+		div_save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				Configuration.setAnzahlminuten(div_autoLaden_Field.getText());
 
-				panelGreen.add(div_save);
+				if (Configuration.isDebug())
+					System.out.println("div_save-Einstellungen gespeichert");
 
-				
-		
-		
-		
+			}
+		});
+
+		panelGreen.add(div_save);
+
 		tabpane.addTab("Diverses", panelGreen);
 
 		// JTabbedPane wird unserem Dialog hinzugefügt
 		add(tabpane);
-		
+
 		// Wir lassen unseren Dialog anzeigen und nix anderes
 		setModal(true);
 		setVisible(true);
-		
+
 	}
-	
+
 }

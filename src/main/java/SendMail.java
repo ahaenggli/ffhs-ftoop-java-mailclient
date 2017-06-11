@@ -8,45 +8,46 @@ import javax.mail.internet.*;
  * @version 02-APR-2015
  */
 public class SendMail {
-	
+
 	private String FehlerText = "";
 	private boolean Erfolg = false;
 	private MailStruktur mail = null;
-	
-	public String getFehlerText(){
+
+	public String getFehlerText() {
 		return FehlerText;
 	}
-	public boolean getErfolg(){
+
+	public boolean getErfolg() {
 		return Erfolg;
 	}
-	
+
 	/**
 	 * Konstruktoren, initalisiert Variablen
 	 */
 
-	public SendMail(){
-	
+	public SendMail() {
+
 	}
-		
+
 	/**
 	 * Sendet eine Mail
 	 *
 	 * @param newMail
-	 *        Mail zum senden
-	 * @return 
-	 * Erfolg ja|nein
+	 *            Mail zum senden
+	 * @return Erfolg ja|nein
 	 */
-	public boolean send(MailStruktur newMail){
+	public boolean send(MailStruktur newMail) {
 		this.mail = newMail;
 		return send();
 	}
+
 	public boolean send() {
 		Erfolg = false;
-		
-		//String Empfaenger = "";
+
+		// String Empfaenger = "";
 		String Betreff = mail.getBetreff();
 		String Nachricht = mail.getNachricht();
-		
+
 		// Sender mail address
 		String from = Configuration.getsmtpUser();
 
@@ -73,22 +74,23 @@ public class SendMail {
 			message.setFrom(new InternetAddress(from));
 
 			// Set To: header field of the header
-			if(mail.getEmpfaenger() != null && !mail.getEmpfaenger().isEmpty())
-			for(String Empfaenger : mail.getEmpfaenger().split(";"))
-			if(Empfaenger != null && !Empfaenger.isEmpty()) message.addRecipient(Message.RecipientType.TO, new InternetAddress(Empfaenger));
+			if (mail.getEmpfaenger() != null && !mail.getEmpfaenger().isEmpty())
+				for (String Empfaenger : mail.getEmpfaenger().split(";"))
+					if (Empfaenger != null && !Empfaenger.isEmpty())
+						message.addRecipient(Message.RecipientType.TO, new InternetAddress(Empfaenger));
 
 			// Set CC: header field of the header
-			if(mail.getCC() != null && !mail.getCC().isEmpty())
-			for(String cc : mail.getCC().split(";"))
-			if(cc != null && !cc.isEmpty()) message.addRecipient(Message.RecipientType.CC, new InternetAddress(cc));
+			if (mail.getCC() != null && !mail.getCC().isEmpty())
+				for (String cc : mail.getCC().split(";"))
+					if (cc != null && !cc.isEmpty())
+						message.addRecipient(Message.RecipientType.CC, new InternetAddress(cc));
 
-			
 			// Set BCC: header field of the header
-			if(mail.getBCC() != null && !mail.getBCC().isEmpty())
-			for(String bcc : mail.getBCC().split(";"))
-			if(bcc != null && !bcc.isEmpty()) message.addRecipient(Message.RecipientType.BCC, new InternetAddress(bcc));
-		
-			
+			if (mail.getBCC() != null && !mail.getBCC().isEmpty())
+				for (String bcc : mail.getBCC().split(";"))
+					if (bcc != null && !bcc.isEmpty())
+						message.addRecipient(Message.RecipientType.BCC, new InternetAddress(bcc));
+
 			// Set Subject: header field
 			message.setSubject(Betreff);
 
@@ -105,11 +107,11 @@ public class SendMail {
 				transport.close();
 			}
 
-			//System.out.println("Message sent");
+			// System.out.println("Message sent");
 		} catch (MessagingException e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			FehlerText = "<html>Hoppla, da ist etwas schief gelaufen.<br> Stimmen die SMTP-Angaben?</html>";
-			Erfolg  = false;
+			Erfolg = false;
 		}
 		return Erfolg;
 	}

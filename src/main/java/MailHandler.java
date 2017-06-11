@@ -4,88 +4,85 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * Handlerklasse für alle Mail-Operateionen
- * - Liste aller Mails in Ordner
- * - Mail zu Ordner hinzu
- * - Mail von Ordner weg
+ * Handlerklasse für alle Mail-Operateionen - Liste aller Mails in Ordner - Mail
+ * zu Ordner hinzu - Mail von Ordner weg
+ * 
  * @author ahaen
  *
  */
 public class MailHandler {
 
-    private Preferences OffenerOrnder = null;
-	
+	private Preferences OffenerOrnder = null;
+
 	private ArrayList<MailStruktur> MailList = new ArrayList<MailStruktur>();
 
-	
-	
 	/**
 	 * Löscht ein Mail in einem Ordner
+	 * 
 	 * @param mail
-	 * 		Mail welches zu löschen ist
-	 * @return
-	 * 		Erfolg true|false
+	 *            Mail welches zu löschen ist
+	 * @return Erfolg true|false
 	 */
-	public boolean removeMail(Preferences mail){
+	public boolean removeMail(Preferences mail) {
 		boolean result = false;
-		
-		if(mail != null){
-		try {
-			mail.clear();
-			mail.removeNode();
-			OffenerOrnder.flush();
-			OffenerOrnder.sync();
-			result = true;
-		} catch (BackingStoreException e) {
-			result = false;
-		}
+
+		if (mail != null) {
+			try {
+				mail.clear();
+				mail.removeNode();
+				OffenerOrnder.flush();
+				OffenerOrnder.sync();
+				result = true;
+			} catch (BackingStoreException e) {
+				result = false;
+			}
 		}
 		return result;
 	}
-	
-	
+
 	/**
-	 * Füg x Mails einem Ordner hinzu
-	 * Wrapper für Einzelmail hinzu
+	 * Füg x Mails einem Ordner hinzu Wrapper für Einzelmail hinzu
+	 * 
 	 * @param mails
-	 * Liste der Mails die einem Ordner hinzugefügt werden sollen
+	 *            Liste der Mails die einem Ordner hinzugefügt werden sollen
 	 * @param folder
-	 * Ordner zum Mail hinzufügen
-	 * @return
-	 * Erfolg true|false
+	 *            Ordner zum Mail hinzufügen
+	 * @return Erfolg true|false
 	 */
-	public static boolean addMailToFolder(ArrayList<MailStruktur> mails, Preferences folder){
+	public static boolean addMailToFolder(ArrayList<MailStruktur> mails, Preferences folder) {
 		boolean result = false;
-		
-		for(MailStruktur mail : mails){
+
+		for (MailStruktur mail : mails) {
 			result = addMailToFolder(mail, folder);
 		}
-		
+
 		return result;
 	}
+
 	/**
 	 * Fügt einem Ordner ein Mail hinzu (Einzeln)
+	 * 
 	 * @param mail
-	 * Mail zum hinzufügen
+	 *            Mail zum hinzufügen
 	 * @param folder
-	 * Order wo Mail rein kommt
-	 * @return
-	 * Erfolg wahr|falsch
+	 *            Order wo Mail rein kommt
+	 * @return Erfolg wahr|falsch
 	 */
-	public static boolean addMailToFolder(MailStruktur mail, Preferences folder){
+	public static boolean addMailToFolder(MailStruktur mail, Preferences folder) {
 		boolean result = false;
-			
-			String msg_name = "";
-			
-			if(mail.getID() == null) msg_name =  MailStruktur.newID();
-			else msg_name = mail.getID();
-			
-			if(!msg_name.startsWith("msg_")) msg_name = "msg_" + msg_name;
-		
-			if(Configuration.createFolder(msg_name, 0, folder)){
-			
-			
-			
+
+		String msg_name = "";
+
+		if (mail.getID() == null)
+			msg_name = MailStruktur.newID();
+		else
+			msg_name = mail.getID();
+
+		if (!msg_name.startsWith("msg_"))
+			msg_name = "msg_" + msg_name;
+
+		if (Configuration.createFolder(msg_name, 0, folder)) {
+
 			Preferences newNachricht = folder.node(msg_name);
 			newNachricht.put("Absender", mail.getAbsender());
 			newNachricht.put("Betreff", mail.getBetreff());
@@ -96,72 +93,65 @@ public class MailHandler {
 			newNachricht.put("CC", mail.getCC());
 			newNachricht.put("BCC", mail.getBCC());
 			result = true;
-			}
-			
-		
-		
+		}
+
 		return result;
 	}
-	
 
 	/**
 	 * Liest alle Mails neu aus in Ordner
 	 * 
 	 * @param quelle
-	 * Ordner zum Mails laden
+	 *            Ordner zum Mails laden
 	 */
 	public void resetData(Preferences quelle) {
-		
+
 		MailList = new ArrayList<MailStruktur>();
 		OffenerOrnder = quelle;
-		
+
 		try {
 			OffenerOrnder.sync();
-			
-			
+
 			for (String childFolder : OffenerOrnder.childrenNames()) {
-				Preferences child = Configuration.getOrdner(childFolder, OffenerOrnder); //parent.node(childFolder);
-				
+				Preferences child = Configuration.getOrdner(childFolder, OffenerOrnder); // parent.node(childFolder);
+
 				// startet mit "msg_" ist also Nachricht :)
 				if (child.name().startsWith("msg_")) {
 					addMail(child);
 				}
 			}
-			
-			
+
 		} catch (BackingStoreException e) {
 
 		}
-		
-		
-		
+
 	}
 
 	/**
-	 * Konstruktor
-	 * Default mit Posteingang gem. Configuration.getEingang()
+	 * Konstruktor Default mit Posteingang gem. Configuration.getEingang()
 	 */
 	public MailHandler() {
 		resetData(Configuration.getEingang());
-	
+
 	}
 
 	/**
 	 * Konstruktor mit spezifischem Ordner
+	 * 
 	 * @param Ordner
-	 * Ordner wo Mails gelesen werden sollen
+	 *            Ordner wo Mails gelesen werden sollen
 	 */
 	public MailHandler(Preferences Ordner) {
-	
+
 		resetData(Ordner);
 
 	}
-	
+
 	/**
 	 * Füge Mail der internen Mailliste hinzu
 	 * 
 	 * @param mail
-	 * Mail zum in der LIste ergänzen
+	 *            Mail zum in der LIste ergänzen
 	 */
 	private void addMail(Preferences mail) {
 		Date Datum = new Date();
@@ -169,9 +159,10 @@ public class MailHandler {
 		String Betreff;
 		String Nachricht;
 
-		//System.out.println(mail.absolutePath());
+		// System.out.println(mail.absolutePath());
 
-		//DateFormat format = new SimpleDateFormat("dd.MM.yyyy H:mm", Locale.GERMAN);
+		// DateFormat format = new SimpleDateFormat("dd.MM.yyyy H:mm",
+		// Locale.GERMAN);
 		try {
 			Datum.setTime(mail.getLong("Datum", 0));
 			// System.out.println(Datum);
@@ -186,23 +177,18 @@ public class MailHandler {
 		ms.setBCC(mail.get("BCC", null));
 		ms.setEmpfaenger(mail.get("Empfaenger", null));
 		ms.setCC(mail.get("CC", null));
-		
+
 		MailList.add(ms);
 		// System.out.println("added Mail");
 	}
 
-	
-
-
 	/**
 	 * Gibt alle Mails im Order zurück
-	 * @return
-	 * Liste aller Mails
+	 * 
+	 * @return Liste aller Mails
 	 */
 	public ArrayList<MailStruktur> getMailList() {
 		return MailList;
 	}
-
-
 
 }

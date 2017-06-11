@@ -4,10 +4,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * Handlerklasse für alle Ordner-Operationen 
- * - Liste aller Ordner 
- * - aktuell gewählter Ordner 
- * - Ordner-Wechseln
+ * Handlerklasse für alle Ordner-Operationen - Liste aller Ordner - aktuell
+ * gewählter Ordner - Ordner-Wechseln
  * 
  * @author ahaen
  *
@@ -48,17 +46,18 @@ public class OrdnerHandler {
 	 */
 	private ArrayList<OrdnerStruktur> makeFolderList(Preferences parentX) {
 		Preferences SucheIn = null;
-		
+
 		// Ist kein Start-Ordner definiert, nimm Hauptordner mit allem drin
 		if (parentX == null) {
 			SucheIn = Configuration.getFolders();
-		} else SucheIn = parentX;
-		
-		if(Configuration.isDebug())
-		System.out.println("--> Absoluter Pfad: " + SucheIn.absolutePath());
-		
+		} else
+			SucheIn = parentX;
+
+		if (Configuration.isDebug())
+			System.out.println("--> Absoluter Pfad: " + SucheIn.absolutePath());
+
 		ArrayList<OrdnerStruktur> tmpList = new ArrayList<OrdnerStruktur>();
-		
+
 		try {
 			for (String childFolder : SucheIn.childrenNames()) {
 				Preferences child = Configuration.getOrdner(childFolder, SucheIn); // SucheIn.node(childFolder);
@@ -66,23 +65,22 @@ public class OrdnerHandler {
 
 				p = "[" + p.replace("/", ", ") + "]";
 
-				if(Configuration.isDebug()){
-				System.out.println("--> Vergleichspfad: " + p);
-				System.out.println("--> Suchenderpfad : " + gewaehlterMailOrdner);
+				if (Configuration.isDebug()) {
+					System.out.println("--> Vergleichspfad: " + p);
+					System.out.println("--> Suchenderpfad : " + gewaehlterMailOrdner);
 				}
-				
+
 				// startet nicht mit "msg_", somit Ordner und weitermachen
 				if (!child.name().startsWith("msg_")) {
 
 					// ist unser gesuchter Ordner, daher aktFolder setzen
 					if (gewaehlterMailOrdner.equals(p)) {
-						
-						
+
 						aktFolder = child;
-						
-						if(Configuration.isDebug())
+
+						if (Configuration.isDebug())
 							System.out.println("---> Ordner gefunden" + aktFolder);
-							
+
 					}
 
 					// auf jeden Fall gefundenen Ordner der Liste anfügen
@@ -93,24 +91,21 @@ public class OrdnerHandler {
 					// ist Mail, daher keine weiteren Schritte hier
 				}
 
-
 			}
 		} catch (BackingStoreException e) {
-			if(Configuration.isDebug())
+			if (Configuration.isDebug())
 				e.printStackTrace();
 		}
 
-		//ArrayList.sort(tmpList);
-		
-		//tmpList.sort(new Comparable<OrdnerStruktur>);
+		// ArrayList.sort(tmpList);
 
-		//List<Contact> contacts = new ArrayList<Contact>();
+		// tmpList.sort(new Comparable<OrdnerStruktur>);
+
+		// List<Contact> contacts = new ArrayList<Contact>();
 		// Fill it.
 
 		Collections.sort(tmpList);
-		
-		
-		
+
 		if (gewaehlterMailOrdner.equals("[" + Configuration.getFolders().name() + "]"))
 			aktFolder = Configuration.getFolders();
 
@@ -137,12 +132,14 @@ public class OrdnerHandler {
 	public void setGewaehlterMailOrdner(String gewaehlterMailOrdner) {
 
 		if (gewaehlterMailOrdner == null)
-			this.gewaehlterMailOrdner  = "[" + Configuration.getNameRootFolder() + ", " + Configuration.getNamePosteingang() + "]";
-		else this.gewaehlterMailOrdner = gewaehlterMailOrdner;
-		
-		if(Configuration.isDebug())
-		System.out.println("-> Öffne Ordner: " + this.gewaehlterMailOrdner);
-		
+			this.gewaehlterMailOrdner = "[" + Configuration.getNameRootFolder() + ", "
+					+ Configuration.getNamePosteingang() + "]";
+		else
+			this.gewaehlterMailOrdner = gewaehlterMailOrdner;
+
+		if (Configuration.isDebug())
+			System.out.println("-> Öffne Ordner: " + this.gewaehlterMailOrdner);
+
 		FolderList = makeFolderList(null);
 	}
 

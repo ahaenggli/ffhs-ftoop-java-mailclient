@@ -39,20 +39,22 @@ public class MailClient_MailFenster extends JDialog {
 	private JButton Weiterleiten = new JButton("Weiterleiten");
 
 	private JLabel err = new JLabel("");
+	private JLabel EmpfAbs = new JLabel("Empfaenger/Absender:");
 	
 	private boolean isAW = false;
 	private boolean isWG = false;
 
+	private MailStruktur MailDaten = new MailStruktur();
 	private JPanel alles;
 
-	/**
-	 * 0 = nichts (gesperrt) 
-	 * 1 = senden (leer) 
-	 * 2 = Antworten 
-	 * 3 = Weiterleiten 
-	 * 4 = Löschen
+	/*
+	 * 0 = nichts (gesperrt); 
+	 * 1 = senden (ungesperrt); 
+	 * 2 = Antworten; 
+	 * 3 = Weiterleiten; 
+	 * 4 = Schliessen;
 	 */
-	
+
 	private int Aktion = 0;
 
 	/**
@@ -83,16 +85,11 @@ public class MailClient_MailFenster extends JDialog {
 
 		if (!e.isEmpty() && !b.isEmpty() && !n.isEmpty()) {
 
-			
-			
-			
 			MailStruktur mail = new MailStruktur(new Date(), Configuration.getsmtpUser(), b, n, null, null);
 			mail.setEmpfaenger(e);
 			mail.setBCC(Blindkopie.getText().trim());
 			mail.setCC(Kopie.getText().trim());
 
-			
-			
 			new SwingWorker<Object, Object>() {
 				SendMail mailSender = new SendMail();
 
@@ -100,7 +97,7 @@ public class MailClient_MailFenster extends JDialog {
 				protected Object doInBackground() throws Exception {
 					err.setText("Versuche das Mail zu senden...");
 					err.setForeground(Color.black);
-					
+
 					changeAction(0);
 					return mailSender.send(mail);
 				}
@@ -111,29 +108,50 @@ public class MailClient_MailFenster extends JDialog {
 						System.out.println("hier");
 						MailHandler.addMailToFolder(mail, Configuration.getGesendet());
 						dispose();
-					} else {						
+					} else {
 						err.setText(mailSender.getFehlerText());
 						err.setForeground(Color.red);
 						changeAction(1);
 					}
 
-			}
-				}.execute();																		
+				}
+			}.execute();
 		}
 	}
-
-
 
 	/**
 	 * Konstruktor
 	 * 
 	 * @param mailStruktur
+	 *            Mail-Inhalt entweder leer (neues Mail) oder mit bestehenden
+	 *            Daten gefuellt
+	 * @param action
+	 *            0 = nichts (gesperrt); 1 = senden (ungesperrt)
 	 */
 	public MailClient_MailFenster(MailStruktur mailStruktur, int action) {
 		super();
-
-		Empfaenger.setText(mailStruktur.getEmpfaenger());
-
+		this.MailDaten = mailStruktur;
+		
+		
+		
+		// label Empaenger oder Absender?
+		if(Aktion == 1)
+		{			
+			Empfaenger.setText(mailStruktur.getEmpfaenger());
+		} else { 			
+			Empfaenger.setText(mailStruktur.getAbsender());
+		}
+		
+		// Spezialfall Postausgang
+		if(Aktion == 0 && null != mailStruktur.getHerkunft() && mailStruktur.getHerkunft().parent() == Configuration.getGesendet())
+		{			
+			Empfaenger.setText(mailStruktur.getEmpfaenger());			
+		}
+		
+		
+		
+		
+		
 		Betreff.setText(mailStruktur.getBetreff());
 		Nachricht.setText(mailStruktur.getNachricht());
 		Kopie.setText(mailStruktur.getCC());
@@ -178,7 +196,7 @@ public class MailClient_MailFenster extends JDialog {
 
 		alles.add(Weiterleiten);
 
-		alles.add(macheLabelZuKomponente("Empfaenger / Absender:", Empfaenger));
+		alles.add(macheLabelZuKomponente(EmpfAbs, Empfaenger));
 		alles.add(macheLabelZuKomponente("Kopie:", Kopie));
 		alles.add(macheLabelZuKomponente("Blindkopie:", Blindkopie));
 		alles.add(macheLabelZuKomponente("Betreff:", Betreff));
@@ -192,7 +210,7 @@ public class MailClient_MailFenster extends JDialog {
 		alles.add(macheLabelZuKomponente("Nachricht:", spEditor));// new
 																	// JScrollPane(Nachricht)));
 		alles.add(err);
-		
+
 		add(alles);
 		doAction();
 		// so viele Fenster wie man möchte erlauben und Parent nicht sperren
@@ -207,7 +225,7 @@ public class MailClient_MailFenster extends JDialog {
 	private void doAction() {
 		boolean setter = false;
 
-		// ((JLabel) getComponentByName("lbl_Empfaenger")).setText("Empfänger");
+		
 		if (Aktion == 0) {
 			setter = false;
 		} else if (Aktion == 1) {
@@ -232,6 +250,21 @@ public class MailClient_MailFenster extends JDialog {
 		} else
 			setter = false;
 
+		// label Empaenger oder Absender?
+		if(Aktion == 1 || isAW || isWG ){
+			EmpfAbs.setText("Empfaenger:");
+		} else { 
+			EmpfAbs.setText("Absender:");			
+		}
+		
+		// Spezialfall Postausgang
+		if(Aktion == 0 && null != this.MailDaten.getHerkunft() && this.MailDaten.getHerkunft().parent() == Configuration.getGesendet())
+		{
+			EmpfAbs.setText("Empfaenger:");		
+		}
+		
+		EmpfAbs.updateUI();
+		
 		Empfaenger.setEnabled(setter);
 		Kopie.setEnabled(setter);
 		Blindkopie.setEnabled(setter);
@@ -245,30 +278,46 @@ public class MailClient_MailFenster extends JDialog {
 			Weiterleiten.setEnabled(false);
 		}
 
+		//System.out.println("Aktion neu: " + Aktion);
+		
 		repaint();
 	}
 
 	/**
-	 * Fuege Label direkt zu Komponente hinzu
+	 * Mache Label aus Text und füge es mit Komponente hinzu
 	 * 
 	 * @param label
+	 * Text fuer Label
 	 * @param comp
-	 * @return
-	 * JPane mit Label und Ursprungskomponente
+	 * Komponente, die belabelt werden soll
+	 * @return JPane mit Label und Ursprungskomponente
 	 */
 	private JPanel macheLabelZuKomponente(String label, Component comp) {
 		label.trim();
 
-		JPanel p = new JPanel();
 		JLabel lbl = new JLabel(label + " ", JLabel.LEFT);
 		lbl.setName("lbl_" + label.replace(":", ""));
 
-		p.setLayout(new BorderLayout());
-		p.add(lbl, BorderLayout.PAGE_START);
-		p.add(comp, BorderLayout.CENTER);
-
-		return p;
+		return macheLabelZuKomponente(lbl, comp);
 
 	}
 
+	/**
+	 * Fasse bestehendes JLabel und Component zusammen
+	 * 
+	 * @param label
+	 * Label fuer Beschriftung
+	 * @param comp
+	 * Komponente, die belabelt werden soll
+	 * @return JPane mit Label und Ursprungskomponente
+	 */
+	private JPanel macheLabelZuKomponente(JLabel label, Component comp) {
+		JPanel p = new JPanel();		
+		label.setHorizontalAlignment(JLabel.LEFT);
+		p.setLayout(new BorderLayout());
+		p.add(label, BorderLayout.PAGE_START);
+		p.add(comp, BorderLayout.CENTER);
+		return p;
+
+	}
 }

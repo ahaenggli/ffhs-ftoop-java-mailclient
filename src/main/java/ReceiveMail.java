@@ -56,9 +56,9 @@ public class ReceiveMail {
 		properties.put("mail.store.protocol", "pop3s");
 
 		// Port optional setzen
-		if(!Configuration.getPop3Port().equals("0") && !Configuration.getPop3Port().isEmpty())
-			properties.put("mail.store.port", Configuration.getPop3Port());	
-			
+		if (!Configuration.getPop3Port().equals("0") && !Configuration.getPop3Port().isEmpty())
+			properties.put("mail.store.port", Configuration.getPop3Port());
+
 		// Get the default Session object
 		Session session = Session.getDefaultInstance(properties);
 
@@ -116,7 +116,7 @@ public class ReceiveMail {
 				 */
 
 				// Mark this message for deletion when the session is closed
-				 msg.setFlag( Flags.Flag.DELETED, true ) ;
+				msg.setFlag(Flags.Flag.DELETED, true);
 			}
 
 			folder.close(true);
