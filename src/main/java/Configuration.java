@@ -76,6 +76,9 @@ public final class Configuration {
 			returnWert = true;
 		} catch (BackingStoreException e) {
 			returnWert = false;
+			if(Configuration.getDebug())
+				e.printStackTrace();
+			
 		}
 		return returnWert;
 	}
@@ -92,6 +95,9 @@ public final class Configuration {
 		try {
 			prefs.sync();
 		} catch (BackingStoreException e) {
+			if(Configuration.getDebug())
+				e.printStackTrace();
+			
 		}
 
 		return prefs.get(Name, "");
@@ -115,7 +121,9 @@ public final class Configuration {
 			prefs.sync();
 			result = true;
 		} catch (BackingStoreException e) {
-
+			if(Configuration.getDebug())
+			e.printStackTrace();
+			
 			result = false;
 		}
 		return result;
@@ -137,7 +145,8 @@ public final class Configuration {
 			prefs.flush();
 			prefs = Preferences.userRoot().node("/ch/ahaenggli/MailClient");
 		} catch (BackingStoreException e) {
-
+			if(Configuration.getDebug())
+			e.printStackTrace();
 		}
 
 	}
@@ -178,12 +187,15 @@ public final class Configuration {
 	public final static Preferences getFolders() {
 
 		// Sicherstellen, dass Ein- und Ausgang existieren
-		try {
-			getEingang();
-			getGesendet();
-		} catch (BackingStoreException e) {
-
-		}
+			
+			try {
+				getEingang();
+				getGesendet();
+			} catch (BackingStoreException e) {
+				if(Configuration.getDebug())
+				e.printStackTrace();
+			}
+		
 
 		return folders;
 	}
@@ -407,7 +419,8 @@ public final class Configuration {
 			if (!folders.nodeExists(NamePosteingang))
 				createFolder(NamePosteingang, 1, folders);
 		} catch (BackingStoreException e) {
-
+			if(Configuration.getDebug())
+			e.printStackTrace();
 		}
 
 		return folders.node(NamePosteingang);
@@ -431,13 +444,17 @@ public final class Configuration {
 	 * 
 	 * @return Zahl
 	 */
-	public final static Long getAnzahlminuten() {
-		Long min = (long) 0;
+	public final static long getAnzahlminuten() {
+		long min = 0;
 
 		try {
 			min = Long.parseLong(getValue(anzahlMinuten));
-		} catch (Exception e) {
-			min = (long) 0;
+		} catch (NumberFormatException e) {
+			min = 0;
+			
+			if(Configuration.getDebug())
+			e.printStackTrace();
+			
 		}
 		return min;
 	}
