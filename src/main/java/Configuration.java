@@ -385,12 +385,14 @@ public final class Configuration {
 	public static Preferences getOrdner(String x, Preferences parent) throws BackingStoreException {
 
 		if (parent == null)
-			parent = folders;
-
+			return folders;
+		else
+		{
 		if (!parent.nodeExists(x))
 			createFolder(x, 1, parent);
 
 		return parent.node(x);
+		}
 	}
 
 	/**

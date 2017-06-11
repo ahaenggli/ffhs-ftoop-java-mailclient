@@ -47,21 +47,22 @@ public class OrdnerHandler {
 	 *            komplette Struktur zurückgegeben
 	 * @return Liste aller Ordner
 	 */
-	private ArrayList<OrdnerStruktur> makeFolderList(Preferences parent) {
-
+	private ArrayList<OrdnerStruktur> makeFolderList(Preferences parentX) {
+		Preferences SucheIn = null;
+		
 		// Ist kein Start-Ordner definiert, nimm Hauptordner mit allem drin
-		if (parent == null) {
-			parent = Configuration.getFolders();
-			System.out.println("-> Absoluter Pfad: " + parent.absolutePath());
-
-		} else {
-			System.out.println("--> Absoluter Pfad: " + parent.absolutePath());
-		}
-
+		if (parentX == null) {
+			SucheIn = Configuration.getFolders();
+		} else SucheIn = parentX;
+		
+		if(Configuration.getDebug())
+		System.out.println("--> Absoluter Pfad: " + SucheIn.absolutePath());
+		
 		ArrayList<OrdnerStruktur> tmpList = new ArrayList<OrdnerStruktur>();
+		
 		try {
-			for (String childFolder : parent.childrenNames()) {
-				Preferences child = Configuration.getOrdner(childFolder, parent); // parent.node(childFolder);
+			for (String childFolder : SucheIn.childrenNames()) {
+				Preferences child = Configuration.getOrdner(childFolder, SucheIn); // SucheIn.node(childFolder);
 				String p = child.absolutePath().replace(Configuration.getPrefs().absolutePath() + "/", "");
 
 				p = "[" + p.replace("/", ", ") + "]";
@@ -79,7 +80,7 @@ public class OrdnerHandler {
 					}
 
 					// auf jeden Fall gefundenen Ordner der Liste anfügen
-					int SortNr = parent.node(childFolder).getInt("SortNr", 0);
+					int SortNr = SucheIn.node(childFolder).getInt("SortNr", 0);
 					tmpList.add(new OrdnerStruktur(SortNr, childFolder, child.absolutePath(), makeFolderList(child)));
 				} else {
 
@@ -130,10 +131,8 @@ public class OrdnerHandler {
 	public void setGewaehlterMailOrdner(String gewaehlterMailOrdner) {
 
 		if (gewaehlterMailOrdner == null)
-			gewaehlterMailOrdner = "[" + Configuration.getNameRootFolder() + ", " + Configuration.getNamePosteingang()
-					+ "]";
-
-		this.gewaehlterMailOrdner = gewaehlterMailOrdner;
+			this.gewaehlterMailOrdner  = "[" + Configuration.getNameRootFolder() + ", " + Configuration.getNamePosteingang() + "]";
+		else this.gewaehlterMailOrdner = gewaehlterMailOrdner;
 		System.out.println("-> Öffne Ordner: " + this.gewaehlterMailOrdner);
 		FolderList = makeFolderList(null);
 	}
