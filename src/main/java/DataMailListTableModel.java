@@ -16,22 +16,22 @@ class DataMailListTableModel extends AbstractTableModel {
 
 	private String[] SpaltenNamen_Normal = { "Datum", "Absender", "Betreff" };
 	private String[] SpaltenNamen_Postausgang = { "Datum", "Empfaenger", "Betreff" };
-	
-	private Preferences  gewaehlterOrdner = null;
+
+	private Preferences gewaehlterOrdner = null;
 	private ArrayList<MailStruktur> tmpMail;
 
 	public DataMailListTableModel() {
 		super();
 	}
-	
-	public void changeOrdner(Preferences Ordner){
-		this.gewaehlterOrdner = Ordner;		
+
+	public void changeOrdner(Preferences Ordner) {
+		this.gewaehlterOrdner = Ordner;
 	}
-	public DataMailListTableModel(Preferences Ordner) {		
+
+	public DataMailListTableModel(Preferences Ordner) {
 		super();
 		this.gewaehlterOrdner = Ordner;
 	}
-	
 
 	public DataMailListTableModel(ArrayList<MailStruktur> tmpMailList) {
 		super();
@@ -43,10 +43,10 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+		if (gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
 			return SpaltenNamen_Postausgang.length;
 		else
-		return SpaltenNamen_Normal.length;
+			return SpaltenNamen_Normal.length;
 	}
 
 	public int getRowCount() {
@@ -59,7 +59,7 @@ class DataMailListTableModel extends AbstractTableModel {
 	}
 
 	public String getColumnName(int col) {
-		if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+		if (gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
 			return SpaltenNamen_Postausgang[col];
 		else
 			return SpaltenNamen_Normal[col];
@@ -71,15 +71,14 @@ class DataMailListTableModel extends AbstractTableModel {
 	public Object getValueAt(int row, int col) {
 		MailStruktur macData = (tmpMail.get(row));
 
-		
 		switch (col) {
 		case 0:
 			return macData.getDatum().toString();
 		case 1:
-			if(gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
-			return macData.getEmpfaenger();
+			if (gewaehlterOrdner != null && gewaehlterOrdner == Configuration.getGesendet())
+				return macData.getEmpfaenger();
 			else
-			return macData.getAbsender();
+				return macData.getAbsender();
 		case 2:
 			return macData.getBetreff();
 		case 3:

@@ -18,13 +18,13 @@ public class OrdnerStruktur implements Comparable<OrdnerStruktur> {
 	 * Konstruktor
 	 * 
 	 * @param SortNr
-	 * LaufNr fuer Sortierung innerhalb Ordner
+	 *            LaufNr fuer Sortierung innerhalb Ordner
 	 * @param Name
-	 * Name des Ordners
+	 *            Name des Ordners
 	 * @param AbsolutePath
-	 * Absoluter Pfad des Ordners
+	 *            Absoluter Pfad des Ordners
 	 * @param Children
-	 * Alle Unterordner des Ordners
+	 *            Alle Unterordner des Ordners
 	 */
 	public OrdnerStruktur(int SortNr, String Name, String AbsolutePath, ArrayList<OrdnerStruktur> Children) {
 		this.SortNr = SortNr;

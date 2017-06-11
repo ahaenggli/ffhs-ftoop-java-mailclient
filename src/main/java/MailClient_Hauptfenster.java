@@ -126,7 +126,6 @@ public class MailClient_Hauptfenster extends JFrame {
 			ms = msX;
 		else
 			ms = new MailStruktur(); // Leeres Mail...
-	
 
 		final MailStruktur fms = ms;
 		final int fParam = ParamX;
@@ -174,16 +173,16 @@ public class MailClient_Hauptfenster extends JFrame {
 	 * 
 	 * @param evt
 	 *            Event mit Point von Aufruf drin
-	 * @return Index (row) von gewähltem Mail in original Array
-	 * Falls Klick ausserhalb Bereich ist Rückgabe = -1
+	 * @return Index (row) von gewähltem Mail in original Array Falls Klick
+	 *         ausserhalb Bereich ist Rückgabe = -1
 	 */
 	public int getSelectedMailListRow(Point evt) {
 		int idx_view = table_mailListe.rowAtPoint(evt);
 		int result = -1;
-		
-		if(idx_view > -1)
-		result = table_mailListe.convertRowIndexToModel(idx_view);
-		
+
+		if (idx_view > -1)
+			result = table_mailListe.convertRowIndexToModel(idx_view);
+
 		return result;
 	}
 
@@ -614,8 +613,8 @@ public class MailClient_Hauptfenster extends JFrame {
 	 */
 	public void refreshMailListe() {
 		mailHandler = new MailHandler(ordnerHandler.getAktFolder());
-		
-		//MailGrideModel = new DataMailListTableModel();
+
+		// MailGrideModel = new DataMailListTableModel();
 		MailGrideModel.changeOrdner(ordnerHandler.getAktFolder());
 		MailGrideModel.setNewData(mailHandler.getMailList());
 		MailGrideModel.fireTableDataChanged();
@@ -630,8 +629,7 @@ public class MailClient_Hauptfenster extends JFrame {
 	public JScrollPane guiGetMailListe() {
 
 		refreshMailListe();
-	
-				
+
 		table_mailListe = new JTable(MailGrideModel);
 		table_mailListe.setFillsViewportHeight(true);
 		table_mailListe.setAutoCreateRowSorter(true);
@@ -643,8 +641,8 @@ public class MailClient_Hauptfenster extends JFrame {
 
 				if (evt.getClickCount() == 2) {
 					int idx = getSelectedMailListRow(evt.getPoint());
-					if(idx > -1 && idx <= mailHandler.getMailList().size())
-					oeffneMailFenster(mailHandler.getMailList().get(idx), 0);
+					if (idx > -1 && idx <= mailHandler.getMailList().size())
+						oeffneMailFenster(mailHandler.getMailList().get(idx), 0);
 
 				}
 			}
@@ -687,7 +685,6 @@ public class MailClient_Hauptfenster extends JFrame {
 		});
 
 		TableColumnModel tcm = table_mailListe.getColumnModel();
-
 
 		JScrollPane scroll = new JScrollPane(table_mailListe);
 

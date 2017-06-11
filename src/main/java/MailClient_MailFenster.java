@@ -40,7 +40,7 @@ public class MailClient_MailFenster extends JDialog {
 
 	private JLabel err = new JLabel("");
 	private JLabel EmpfAbs = new JLabel("Empfaenger/Absender:");
-	
+
 	private boolean isAW = false;
 	private boolean isWG = false;
 
@@ -48,11 +48,8 @@ public class MailClient_MailFenster extends JDialog {
 	private JPanel alles;
 
 	/*
-	 * 0 = nichts (gesperrt); 
-	 * 1 = senden (ungesperrt); 
-	 * 2 = Antworten; 
-	 * 3 = Weiterleiten; 
-	 * 4 = Schliessen;
+	 * 0 = nichts (gesperrt); 1 = senden (ungesperrt); 2 = Antworten; 3 =
+	 * Weiterleiten; 4 = Schliessen;
 	 */
 
 	private int Aktion = 0;
@@ -131,32 +128,25 @@ public class MailClient_MailFenster extends JDialog {
 	public MailClient_MailFenster(MailStruktur mailStruktur, int action) {
 		super();
 		this.MailDaten = mailStruktur;
-		
-		
-		
+
 		// label Empaenger oder Absender?
-		if(Aktion == 1)
-		{			
+		if (Aktion == 1) {
 			Empfaenger.setText(mailStruktur.getEmpfaenger());
-		} else { 			
+		} else {
 			Empfaenger.setText(mailStruktur.getAbsender());
 		}
-		
+
 		// Spezialfall Postausgang
-		if(Aktion == 0 && null != mailStruktur.getHerkunft() && mailStruktur.getHerkunft().parent() == Configuration.getGesendet())
-		{			
-			Empfaenger.setText(mailStruktur.getEmpfaenger());			
+		if (Aktion == 0 && null != mailStruktur.getHerkunft()
+				&& mailStruktur.getHerkunft().parent() == Configuration.getGesendet()) {
+			Empfaenger.setText(mailStruktur.getEmpfaenger());
 		}
-		
-		
-		
-		
-		
+
 		Betreff.setText(mailStruktur.getBetreff());
 		Nachricht.setText(mailStruktur.getNachricht());
 		Kopie.setText(mailStruktur.getCC());
 		Blindkopie.setText(mailStruktur.getBCC());
-		
+
 		Aktion = action;
 
 		setTitle("Nachricht");
@@ -225,7 +215,6 @@ public class MailClient_MailFenster extends JDialog {
 	private void doAction() {
 		boolean setter = false;
 
-		
 		if (Aktion == 0) {
 			setter = false;
 		} else if (Aktion == 1) {
@@ -251,20 +240,20 @@ public class MailClient_MailFenster extends JDialog {
 			setter = false;
 
 		// label Empaenger oder Absender?
-		if(Aktion == 1 || isAW || isWG ){
+		if (Aktion == 1 || isAW || isWG) {
 			EmpfAbs.setText("Empfaenger:");
-		} else { 
-			EmpfAbs.setText("Absender:");			
+		} else {
+			EmpfAbs.setText("Absender:");
 		}
-		
+
 		// Spezialfall Postausgang
-		if(Aktion == 0 && null != this.MailDaten.getHerkunft() && this.MailDaten.getHerkunft().parent() == Configuration.getGesendet())
-		{
-			EmpfAbs.setText("Empfaenger:");		
+		if (Aktion == 0 && null != this.MailDaten.getHerkunft()
+				&& this.MailDaten.getHerkunft().parent() == Configuration.getGesendet()) {
+			EmpfAbs.setText("Empfaenger:");
 		}
-		
+
 		EmpfAbs.updateUI();
-		
+
 		Empfaenger.setEnabled(setter);
 		Kopie.setEnabled(setter);
 		Blindkopie.setEnabled(setter);
@@ -278,8 +267,8 @@ public class MailClient_MailFenster extends JDialog {
 			Weiterleiten.setEnabled(false);
 		}
 
-		//System.out.println("Aktion neu: " + Aktion);
-		
+		// System.out.println("Aktion neu: " + Aktion);
+
 		repaint();
 	}
 
@@ -287,9 +276,9 @@ public class MailClient_MailFenster extends JDialog {
 	 * Mache Label aus Text und füge es mit Komponente hinzu
 	 * 
 	 * @param label
-	 * Text fuer Label
+	 *            Text fuer Label
 	 * @param comp
-	 * Komponente, die belabelt werden soll
+	 *            Komponente, die belabelt werden soll
 	 * @return JPane mit Label und Ursprungskomponente
 	 */
 	private JPanel macheLabelZuKomponente(String label, Component comp) {
@@ -306,13 +295,13 @@ public class MailClient_MailFenster extends JDialog {
 	 * Fasse bestehendes JLabel und Component zusammen
 	 * 
 	 * @param label
-	 * Label fuer Beschriftung
+	 *            Label fuer Beschriftung
 	 * @param comp
-	 * Komponente, die belabelt werden soll
+	 *            Komponente, die belabelt werden soll
 	 * @return JPane mit Label und Ursprungskomponente
 	 */
 	private JPanel macheLabelZuKomponente(JLabel label, Component comp) {
-		JPanel p = new JPanel();		
+		JPanel p = new JPanel();
 		label.setHorizontalAlignment(JLabel.LEFT);
 		p.setLayout(new BorderLayout());
 		p.add(label, BorderLayout.PAGE_START);
